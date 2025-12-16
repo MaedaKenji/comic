@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <title>Vortex Scans</title>
 
-    @viteReactRefresh
-    @vite('resources/js/app.tsx')
+<head>
+    <meta charset="utf-8" /> @viteReactRefresh @vite('resources/js/app.tsx') @inertiaHead
 </head>
-<body class="bg-black text-white">
-    <div id="app"></div>
-</body>
+
+<body> @inertia </body>
+
 </html>

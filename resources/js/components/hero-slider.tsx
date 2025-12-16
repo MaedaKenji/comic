@@ -1,33 +1,115 @@
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import { Manga } from "../types/manga";
+import { useRef } from 'react';
+import 'swiper/css';
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+export type HeroItem = {
+    id: number;
+    title: string;
+    cover: string;
+    badge?: string;
+    chips?: string[];
+};
 
 interface Props {
-  items: Manga[];
+    items: HeroItem[];
+    onClickItem?: (item: HeroItem) => void;
 }
 
-const HeroSlider: React.FC<Props> = ({ items }) => {
-  return (
-    <Swiper slidesPerView={3} spaceBetween={20}>
-      {items.map((item) => (
-        <SwiperSlide key={item.id}>
-          <div
-            className="h-[350px] rounded-xl bg-cover bg-center relative"
-            style={{ backgroundImage: `url(${item.cover})` }}
-          >
-            {item.is_hot && (
-              <span className="absolute top-4 left-4 bg-orange-500 px-2 py-1 text-sm rounded">
-                Hot
-              </span>
-            )}
-            <div className="absolute bottom-4 left-4">
-              <h2 className="text-xl font-bold">{item.title}</h2>
-            </div>
-          </div>
-        </SwiperSlide>
-      ))}
-    </Swiper>
-  );
+const HeroSlider: React.FC<Props> = ({ items, onClickItem }) => {
+    const isDragging = useRef(false);
+
+    return (
+        <section className="w-full overflow-hidden">
+            <Swiper
+                // modules={[Autoplay]}
+                slidesPerView={3}
+                spaceBetween={12}
+                loop
+                grabCursor
+                // autoplay={{
+                //     delay: 4500,
+                //     disableOnInteraction: false,
+                // }}
+                onTouchMove={() => (isDragging.current = true)}
+                onTouchEnd={() =>
+                    setTimeout(() => (isDragging.current = false), 50)
+                }
+                breakpoints={{
+                    0: {
+                        slidesPerView: 1,
+                    },
+                    768: {
+                        slidesPerView: 2,
+                    },
+                    1280: {
+                        slidesPerView: 3,
+                    },
+                }}
+                className="hero-swiper"
+            >
+                {items.map((item) => (
+                    <SwiperSlide key={item.id}>
+                        <div
+                            className="xl:h-[360px]cursor-pointer rounded- relative h-[260px] w-full select-none md:h-[430px]"
+                            onClick={() => {
+                                if (!isDragging.current && onClickItem) {
+                                    onClickItem(item);
+                                }
+                            }}
+                        >
+                            {/* image */}
+                            <img
+                                src={item.cover}
+                                alt={item.title}
+                                draggable={false}
+                                className="absolute inset-0 h-full w-full rounded-lg object-cover"
+                            />
+
+                            {/* overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+
+                            {/* content */}
+                            <div className="absolute right-8 bottom-8 left-8">
+                                {/* {item.badge && (
+                                    <span className="relative left-1/2 mx-auto mb-3 block inline-flex w-fit -translate-x-1/2 items-center justify-center rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-black ...">
+                                        🔥 {item.badge}
+                                    </span>
+                                )} */}
+
+                                {item.badge && (
+                                    <span className="relative left-1/2 mx-auto mb-3 block inline-flex w-fit -translate-x-1/2 items-center justify-center rounded-full ... bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 px-3 py-1 text-xs font-semibold text-black shadow-[0_0_12px_rgba(255,140,0,0.6)]">
+                                        🔥 {item.badge}
+                                    </span>
+                                )}
+
+                                <h2 className="text-center text-2xl leading-tight font-extrabold text-white drop-shadow xl:text-3xl">
+                                    {item.title}
+                                </h2>
+                                {item.chips && (
+                                    <div className="mt-3 flex flex-wrap justify-center gap-2">
+                                        {item.chips.map((c) => (
+                                            <span
+                                                key={c}
+                                                className="relative inline-flex items-center justify-center"
+                                            >
+                                                {/* glow layer */}
+                                                <span className="absolute inset-0 rounded-full bg-red-600 opacity-60 blur-md"></span>
+
+                                                {/* main chip */}
+                                                <span className="relative rounded-full bg-black/90 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
+                                                    {c}
+                                                </span>
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </SwiperSlide>
+                ))}
+            </Swiper>
+        </section>
+    );
 };
 
 export default HeroSlider;

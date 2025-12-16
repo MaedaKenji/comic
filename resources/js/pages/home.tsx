@@ -4,34 +4,54 @@ import HeroRow from "../components/hero-row";
 import HorizontalShelf from "../components/horizontal-shelf";
 import MangaCard, { MangaItem } from "../components/manga-card";
 import { HeroItem } from "../components/hero-card";
+import HeroSlider from "@/components/hero-slider";
 
 const hero: HeroItem[] = [
-  {
-    id: 1,
-    title: "Talk To Your Favorite Characters",
-    cover:
-      "https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=1600&q=80",
-    chips: ["∞ Unlimited chats", "🎧 Voice calls", "🛡️ Ad-free forever"],
-    watermark: "VORTEX SCANS",
-  },
-  {
-    id: 2,
-    title: "Barbarian's Adventure In A Fantasy World",
-    cover:
-      "https://images.unsplash.com/photo-1520975958225-1c190adf4f9a?auto=format&fit=crop&w=1600&q=80",
-    badge: "Hot",
-    chips: ["Action", "Manhwa"],
-    watermark: "VORTEX SCANS",
-  },
-  {
-    id: 3,
-    title: "Return Of The Apocalypse-Class Death Knight",
-    cover:
-      "https://images.unsplash.com/photo-1526318472351-c75fcf070305?auto=format&fit=crop&w=1600&q=80",
-    badge: "Hot",
-    chips: ["Action", "Revenge"],
-    watermark: "VORTEX SCANS",
-  },
+    {
+        id: 1,
+        title: "Talk To Your Favorite Characters",
+        cover: "https://storage.vexmanga.com/public/upload/2025/05/26/369150fe-85b2-45fa-91a7-afb60c12dfd5.webp",
+        chips: ["∞ Unlimited chats", "🎧 Voice calls", "🛡️ Ad-free forever"],
+        watermark: "VORTEX SCANS",
+    },
+    {
+        id: 2,
+        title: "Barbarian's Adventure In A Fantasy World",
+        cover: "https://storage.vexmanga.com/public/upload/2025/05/26/369150fe-85b2-45fa-91a7-afb60c12dfd5.webp",
+        badge: "Hot",
+        chips: ["Action", "Manhwa"],
+        watermark: "VORTEX SCANS",
+    },
+    {
+        id: 3,
+        title: "Return Of The Apocalypse-Class Death Knight",
+        cover: "https://storage.vexmanga.com/public/upload/2025/05/26/369150fe-85b2-45fa-91a7-afb60c12dfd5.webp",
+        badge: "Hot",
+        chips: ["Action", "Revenge"],
+        watermark: "VORTEX SCANS",
+    },
+    {
+        id: 4,
+        title: "The Legendary Mechanic",
+        cover: "https://storage.vexmanga.com/public/upload/2025/05/26/369150fe-85b2-45fa-91a7-afb60c12dfd5.webp",
+        chips: ["Sci-fi", "Game"],
+        watermark: "VORTEX SCANS",
+    },
+    {
+        id: 5,
+        title: "The Strongest Florist",
+        cover: "https://storage.vexmanga.com/public/upload/2025/05/26/369150fe-85b2-45fa-91a7-afb60c12dfd5.webp",
+        chips: ["Romance", "Comedy"],
+        watermark: "VORTEX SCANS",
+    },
+    {
+        id: 6,
+        title: "The Villainess Reverses The Hourglass",
+        cover: "https://storage.vexmanga.com/public/upload/2025/05/26/369150fe-85b2-45fa-91a7-afb60c12dfd5.webp",
+        badge: "Hot",
+        chips: ["Drama", "Revenge"],
+        watermark: "VORTEX SCANS",
+    }
 ];
 
 const popular: MangaItem[] = Array.from({ length: 10 }).map((_, i) => ({
@@ -49,8 +69,11 @@ const Home: React.FC = () => {
 
       <Navbar />
 
-      <main className="mx-auto max-w-[1400px] px-6 pb-16">
-        <HeroRow items={hero} />
+      <main className="mx-auto px-2">
+        {<HeroSlider items={hero} />}
+        {/* <HeroRow items={hero} /> */}
+
+        
 
         <HorizontalShelf title="Popular Today">
           {popular.map((m) => (

@@ -1,6 +1,7 @@
-@import 'tailwindcss';
-
 @import "tw-animate-css";
+@import "tailwindcss";
+
+
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -152,3 +153,29 @@
         @apply bg-background text-foreground;
     }
 }
+
+@font-face {
+  font-family: 'Gotham';
+  src: url('/public/fonts/gotham/Gotham-Book.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gotham';
+  src: url('/public/fonts/gotham/Gotham-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gotham';
+  src: url('/public/fonts/gotham/GOTHAM-BOLD.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@theme {
+  --font-gotham: 'Gotham', ui-sans-serif, system-ui;
+}
+

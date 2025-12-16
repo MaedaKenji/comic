@@ -6,41 +6,19 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
 
-import React from "react";
-import Home from "./pages/home";
+const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const container = document.getElementById('app')!;
 
-const container = document.getElementById("app")!;
-
-createRoot(container).render(
-  <React.StrictMode>
-    <Home />
-  </React.StrictMode>
-);
+createInertiaApp({
+  resolve: (name) =>
+    resolvePageComponent(
+      `./pages/${name}.tsx`,
+      import.meta.glob('./pages/**/*.tsx')
+    ),
+  setup({ el, App, props }) {
+    createRoot(el).render(<App {...props} />)
+  },
+})
 
 // This will set light / dark mode on load...
 initializeTheme();
-
-// const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
-
-// createInertiaApp({
-//     title: (title) => (title ? `${title} - ${appName}` : appName),
-//     resolve: (name) =>
-//         resolvePageComponent(
-//             `./pages/${name}.tsx`,
-//             import.meta.glob('./pages/**/*.tsx'),
-//         ),
-//     setup({ el, App, props }) {
-//         const root = createRoot(el);
-
-//         root.render(
-//             <StrictMode>
-//                 <App {...props} />
-//             </StrictMode>,
-//         );
-//     },
-//     progress: {
-//         color: '#4B5563',
-//     },
-// });
-
-
