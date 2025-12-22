@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { Link, router, usePage } from '@inertiajs/react';
+import React, { useEffect, useRef, useState } from 'react';
 
 type NavItem = { label: string; href?: string; active?: boolean };
 
@@ -12,7 +13,22 @@ const Navbar: React.FC = () => {
     const [openSearch, setOpenSearch] = useState(false);
     const [openNotif, setOpenNotif] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [openAuth, setOpenAuth] = useState(false);
+    const { auth } = usePage().props as any;
+    const authDropdownRef = useRef<HTMLDivElement | null>(null);
 
+    {
+        auth.user ? (
+            <>
+                <span>{auth.user.name}</span>
+                <button onClick={() => router.post('/logout')}>Logout</button>
+            </>
+        ) : (
+            <Link href="/login">Login</Link>
+        );
+    }
+
+    // Close search on ESC
     useEffect(() => {
         const onEsc = (e: KeyboardEvent) => {
             if (e.key === 'Escape') setOpenSearch(false);
@@ -21,12 +37,29 @@ const Navbar: React.FC = () => {
         return () => window.removeEventListener('keydown', onEsc);
     }, []);
 
+    // Prevent body scroll when search is open
     useEffect(() => {
         document.body.style.overflow = openSearch ? 'hidden' : '';
     }, [openSearch]);
 
-    const [openAuth, setOpenAuth] = useState(false);
-    const isAuthenticated = false; // nanti dari backend / context
+    //
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                authDropdownRef.current &&
+                !authDropdownRef.current.contains(event.target as Node)
+            ) {
+                setOpenAuth(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+    //
 
     return (
         <header className="sticky top-0 z-50 border-b border-white/5 bg-black/80 backdrop-blur">
@@ -188,52 +221,113 @@ const Navbar: React.FC = () => {
                                 )}
                             </div>
 
-                            <div className="flex">
-                                {/* Profile */}
+                            {/* Profile */}
+                            <div className="flex" ref={authDropdownRef} >
+                                {/* PROFILE BUTTON */}
                                 <button
-                                    className="transition hover:text-white"
-                                    aria-label="Profile"
-                                    onClick={() => {
-                                        if (isAuthenticated) {
-                                            window.location.href = '/profile'; // atau navigate("/profile")
-                                        } else {
-                                            setOpenAuth((v) => !v);
-                                        }
-                                    }}
+                                    className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-emerald-500 text-sm font-bold text-black"
+                                    onClick={() => setOpenAuth((v) => !v)}
+                                    aria-label="Profile menu"
                                 >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 24 24"
-                                        fill="currentColor"
-                                        aria-hidden="true"
-                                        data-slot="icon"
-                                        className="h-4 w-4"
-                                    >
-                                        {' '}
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
-                                            clip-rule="evenodd"
-                                        ></path>{' '}
-                                    </svg>
+                                    {auth.user?.avatar ? (
+                                        <img
+                                            src={auth.user.avatar}
+                                            alt={auth.user.name}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    ) : (
+                                        auth.user?.name?.[0]?.toUpperCase() || (
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                                fill="currentColor"
+                                                className="h-4 w-4"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        )
+                                    )}
                                 </button>
 
-                                {/* AUTH POPUP */}
-                                {!isAuthenticated && openAuth && (
-                                    <div className="absolute right-0 mt-8 w-64 rounded-2xl border border-white/10 bg-[#0b0d10] p-4 shadow-2xl">
-                                        <a
+                                {/* LOGGED-IN DROPDOWN */}
+                                {auth.user && openAuth && (
+                                    <div className="absolute right-0 mt-10 w-72 rounded-2xl border border-white/10 bg-[#0b0d10] p-3 shadow-2xl">
+                                        {/* USER INFO */}
+                                        <div className="flex items-center gap-3 rounded-xl bg-white/5 p-3">
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 font-bold text-black">
+                                                {auth.user.name[0].toUpperCase()}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="truncate font-semibold text-white">
+                                                    {auth.user.name}
+                                                </p>
+                                                <p className="truncate text-xs text-white/60">
+                                                    {auth.user.email}
+                                                </p>
+                                            </div>
+                                            <span className="ml-auto rounded bg-white/10 px-2 py-0.5 text-[10px] text-white/70">
+                                                USER
+                                            </span>
+                                        </div>
+
+                                        {/* MENU */}
+                                        <div className="mt-2 space-y-1 text-sm">
+                                            <Link
+                                                href="/coins"
+                                                className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-white/5"
+                                            >
+                                                💰 <span>Coins</span>
+                                                <span className="ml-auto text-white/60">
+                                                    0
+                                                </span>
+                                            </Link>
+
+                                            <Link
+                                                href="/profile"
+                                                className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-white/5"
+                                            >
+                                                👤 <span>View Profile</span>
+                                            </Link>
+
+                                            <Link
+                                                href="/support"
+                                                className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-white/5"
+                                            >
+                                                ❓ <span>Help & Support</span>
+                                            </Link>
+
+                                            <button
+                                                onClick={() =>
+                                                    router.post('/logout')
+                                                }
+                                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-red-400 hover:bg-red-500/10"
+                                            >
+                                                🚪 <span>Log Out</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* GUEST POPUP (unchanged) */}
+                                {!auth.user && openAuth && (
+                                    <div className="absolute right-0 mt-10 w-64 rounded-2xl border border-white/10 bg-[#0b0d10] p-4 shadow-2xl">
+                                        <Link
                                             href="/login"
                                             className="block w-full rounded-full bg-red-600 py-3 text-center font-semibold transition hover:bg-red-500"
                                         >
                                             Sign In
-                                        </a>
+                                        </Link>
 
-                                        <a
+                                        <Link
                                             href="/register"
                                             className="mt-3 block w-full rounded-full border border-white/10 py-3 text-center text-white/80 transition hover:bg-white/5"
                                         >
                                             Create Account
-                                        </a>
+                                        </Link>
                                     </div>
                                 )}
                             </div>

@@ -4,8 +4,9 @@ import Navbar from '../components/navbar';
 
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
+    const [info, setInfo] = useState<string | null>(null);
 
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, clearErrors } = useForm({
         email: '',
         password: '',
         remember: false,
@@ -13,7 +14,9 @@ export default function Login() {
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        post('/login');
+        post('/login', {
+            preserveScroll: true,
+        });
     }
 
     return (
@@ -49,6 +52,11 @@ export default function Login() {
                                     <input
                                         type="email"
                                         placeholder="username@domain.com"
+                                        value={data.email}
+                                        onChange={(e) => {
+                                            setData('email', e.target.value);
+                                            clearErrors('email');
+                                        }}
                                         className="w-full bg-transparent py-2 text-sm focus:outline-none"
                                     />
                                 </div>
@@ -73,6 +81,12 @@ export default function Login() {
                                         type={
                                             showPassword ? 'text' : 'password'
                                         }
+                                        value={data.password}
+                                        onChange={(e) => {
+                                            setData('password', e.target.value);
+                                            clearErrors('password');
+                                        }}
+                                        placeholder="Your password"
                                         className="w-full bg-transparent py-2 text-sm focus:outline-none"
                                     />
                                     <button
@@ -86,6 +100,19 @@ export default function Login() {
                                     </button>
                                 </div>
                             </div>
+                            {/* INFO */}
+                            {info && (
+                                <div className="rounded bg-blue-500/10 px-3 py-2 text-xs text-blue-300">
+                                    {info}
+                                </div>
+                            )}
+                            {/* ERRORS */}
+                            {(errors.email || errors.password) && (
+                                <div className="rounded bg-red-500/10 px-3 py-2 text-xs text-red-300">
+                                    {errors.email ?? errors.password}
+                                </div>
+                            )}
+                            
 
                             <button
                                 type="submit"

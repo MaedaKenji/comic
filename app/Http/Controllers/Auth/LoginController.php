@@ -17,13 +17,12 @@ class LoginController
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             throw ValidationException::withMessages([
-                'email' => 'Invalid email or password.',
+                'auth' => 'Invalid email or password.',
             ]);
         }
 
         $request->session()->regenerate();
 
         return redirect()->intended('/home');
-
     }
 }
