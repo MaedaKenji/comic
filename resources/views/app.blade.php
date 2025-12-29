@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8" /> @viteReactRefresh @vite('resources/js/app.tsx') @inertiaHead
+    @routes
 </head>
 
 <body> @inertia </body>

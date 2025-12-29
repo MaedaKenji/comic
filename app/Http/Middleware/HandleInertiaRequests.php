@@ -8,6 +8,8 @@ use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
+
+
     /**
      * The root template that's loaded on the first page visit.
      *
@@ -38,14 +40,38 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $user = $request->user();
+
         return [
             ...parent::share($request),
+
             'name' => config('app.name'),
-            'quote' => ['message' => trim($message), 'author' => trim($author)],
-            'auth' => [
-                'user' => $request->user(),
+
+            'quote' => [
+                'message' => trim($message),
+                'author' => trim($author),
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+
+            'auth' => [
+                'user' => $user ? [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'username' => $user->username, // ✅ ADDED
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'avatar' => $user->avatar ?? null, // optional but useful
+                ] : null,
+            ],
+
+            'sidebarOpen' =>
+                !$request->hasCookie('sidebar_state')
+                || $request->cookie('sidebar_state') === 'true',
+
+            'flash' => [
+                'success' => fn() => $request->session()->get('success'),
+                'error' => fn() => $request->session()->get('error'),
+            ],
         ];
     }
+
 }

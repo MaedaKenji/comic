@@ -12,12 +12,11 @@ export default function Login() {
         remember: false,
     });
 
-    function submit(e: React.FormEvent) {
-        e.preventDefault();
-        post('/login', {
-            preserveScroll: true,
-        });
-    }
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    post('/login');
+}
+
 
     return (
         <>

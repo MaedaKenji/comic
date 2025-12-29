@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 
-class LoginController
+class LoginController extends Controller
 {
     public function store(Request $request)
     {
@@ -21,8 +23,21 @@ class LoginController
             ]);
         }
 
+        // 🔒 Regenerate session
         $request->session()->regenerate();
 
-        return redirect()->intended('/home');
+        $user = Auth::user();
+        $currentSessionId = Session::getId();
+
+        // 🚫 Kick previous session if exists
+        if ($user->session_id && $user->session_id !== $currentSessionId) {
+            Session::getHandler()->destroy($user->session_id);
+        }
+
+        // ✅ Save current session
+        $user->session_id = $currentSessionId;
+        $user->save();
+
+        return redirect()->route('home');
     }
 }

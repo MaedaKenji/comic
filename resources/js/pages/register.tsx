@@ -9,7 +9,6 @@ const Register: React.FC = () => {
         username: '',
         email: '',
         password: '',
-        country: '',
     });
 
     function submit(e: React.FormEvent) {
@@ -75,7 +74,7 @@ const Register: React.FC = () => {
                     </div>
 
                     {/* Form */}
-                    <form className="space-y-4 text-left">
+                    <form className="space-y-4 text-left" onSubmit={submit}>
                         {/* Username */}
                         <div>
                             <label className="mb-1 block text-xs text-white/60">
@@ -84,10 +83,20 @@ const Register: React.FC = () => {
                             <div className="flex items-center rounded-lg bg-white/10 px-3 py-2">
                                 <input
                                     type="text"
+                                    value={data.username}
+                                    onChange={(e) => {
+                                        setData('username', e.target.value);
+                                        clearErrors('username');
+                                    }}
                                     placeholder="Enter your username"
                                     className="w-full bg-transparent text-sm outline-none placeholder:text-white/40"
                                 />
                             </div>
+                            {errors.username && (
+                                <p className="mt-1 text-xs text-red-400">
+                                    {errors.username}
+                                </p>
+                            )}
                         </div>
 
                         {/* Email */}
@@ -98,10 +107,20 @@ const Register: React.FC = () => {
                             <div className="flex items-center rounded-lg bg-white/10 px-3 py-2">
                                 <input
                                     type="email"
+                                    value={data.email}
+                                    onChange={(e) => {
+                                        setData('email', e.target.value);
+                                        clearErrors('email');
+                                    }}
                                     placeholder="you@example.com"
                                     className="w-full bg-transparent text-sm outline-none placeholder:text-white/40"
                                 />
                             </div>
+                            {errors.email && (
+                                <p className="mt-1 text-xs text-red-400">
+                                    {errors.email}
+                                </p>
+                            )}
                         </div>
 
                         {/* Password */}
@@ -112,31 +131,29 @@ const Register: React.FC = () => {
                             <div className="flex items-center rounded-lg bg-white/10 px-3 py-2">
                                 <input
                                     type="password"
+                                    value={data.password}
+                                    onChange={(e) => {
+                                        setData('password', e.target.value);
+                                        clearErrors('password');
+                                    }}
                                     placeholder="Enter your password"
                                     className="w-full bg-transparent text-sm outline-none placeholder:text-white/40"
                                 />
                             </div>
-                        </div>
-
-                        {/* Country */}
-                        <div>
-                            <label className="mb-1 block text-xs text-white/60">
-                                Country (optional)
-                            </label>
-                            <select className="w-full rounded-lg bg-white/10 px-3 py-2 text-sm text-white outline-none">
-                                <option>Select...</option>
-                                <option>Indonesia</option>
-                                <option>United States</option>
-                                <option>Japan</option>
-                            </select>
+                            {errors.password && (
+                                <p className="mt-1 text-xs text-red-400">
+                                    {errors.password}
+                                </p>
+                            )}
                         </div>
 
                         {/* Register Button */}
                         <button
                             type="submit"
-                            className="mt-4 w-full rounded-lg bg-white/20 py-2 text-sm font-semibold transition hover:bg-white/30"
+                            disabled={processing}
+                            className="mt-4 w-full rounded-lg bg-white/20 py-2 text-sm font-semibold transition hover:bg-white/30 disabled:opacity-50"
                         >
-                            Register
+                            {processing ? 'Registering…' : 'Register'}
                         </button>
                     </form>
 

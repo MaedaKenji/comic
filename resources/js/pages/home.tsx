@@ -62,9 +62,13 @@ const popular: MangaItem[] = Array.from({ length: 10 }).map((_, i) => ({
 
 const Home: React.FC = () => {
     const { auth } = usePage().props as any;
+    const isAdmin = auth?.user?.role === 'admin';
 
     return (
         <div className="min-h-screen bg-[#050607] text-white">
+            {/* head title */}
+            <title>Vortex Manga</title>
+
             {/* subtle background glow */}
             <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_0%,rgba(220,38,38,0.18),transparent_40%),radial-gradient(circle_at_90%_10%,rgba(59,130,246,0.10),transparent_35%)]" />
 
@@ -72,13 +76,37 @@ const Home: React.FC = () => {
 
             <main className="mx-auto px-2">
                 {<HeroSlider items={hero} />}
-                {/* <HeroRow items={hero} /> */}
 
                 <HorizontalShelf title="Popular Today">
                     {popular.map((m) => (
                         <MangaCard key={m.id} item={m} />
                     ))}
                 </HorizontalShelf>
+
+                {/* Admin Floating Add Button */}
+                {auth?.user?.role === 'admin' && (
+                    <Link
+                        href="/admin/comics/create"
+                        className="fixed right-6 bottom-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-white shadow-lg transition hover:scale-105 hover:bg-red-700"
+                        aria-label="Add Comic"
+                        title="Add Comic"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2.5}
+                            stroke="currentColor"
+                            className="h-7 w-7"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M12 4.5v15m7.5-7.5h-15"
+                            />
+                        </svg>
+                    </Link>
+                )}
             </main>
         </div>
     );

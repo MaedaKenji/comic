@@ -1,13 +1,7 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import React, { useEffect, useRef, useState } from 'react';
+import FlashSuccess from './flash-popup';
 
-type NavItem = { label: string; href?: string; active?: boolean };
-
-const items = [
-    { label: 'Home', href: '/', active: true },
-    { label: 'Series', href: '/series' },
-    { label: 'Novels', href: '/novels' },
-];
 
 const Navbar: React.FC = () => {
     const [openSearch, setOpenSearch] = useState(false);
@@ -16,11 +10,23 @@ const Navbar: React.FC = () => {
     const [openAuth, setOpenAuth] = useState(false);
     const { auth } = usePage().props as any;
     const authDropdownRef = useRef<HTMLDivElement | null>(null);
+    const notifDropdownRef = useRef<HTMLDivElement>(null);
+    const searchRef = useRef(null);
+
+    type NavItem = { label: string; href?: string; active?: boolean };
+
+    const items = [
+        { label: 'Home', href: '/', active: true },
+        { label: 'Series', href: '/series' },
+        { label: 'Novels', href: '/novels' },
+    ];
+
+    const { flash } = usePage().props as any;
 
     {
         auth.user ? (
             <>
-                <span>{auth.user.name}</span>
+                <span>{auth.user.username}</span>
                 <button onClick={() => router.post('/logout')}>Logout</button>
             </>
         ) : (
@@ -28,38 +34,52 @@ const Navbar: React.FC = () => {
         );
     }
 
-    // Close search on ESC
     useEffect(() => {
-        const onEsc = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') setOpenSearch(false);
-        };
-        window.addEventListener('keydown', onEsc);
-        return () => window.removeEventListener('keydown', onEsc);
-    }, []);
-
-    // Prevent body scroll when search is open
-    useEffect(() => {
-        document.body.style.overflow = openSearch ? 'hidden' : '';
-    }, [openSearch]);
-
-    //
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                authDropdownRef.current &&
-                !authDropdownRef.current.contains(event.target as Node)
-            ) {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setOpenSearch(false);
                 setOpenAuth(false);
+                setOpenNotif(false);
             }
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as Node;
+
+            if (
+                authDropdownRef.current &&
+                !authDropdownRef.current.contains(target)
+            ) {
+                setOpenAuth(false);
+            }
+
+            if (
+                notifDropdownRef.current &&
+                !notifDropdownRef.current.contains(target)
+            ) {
+                setOpenNotif(false);
+            }
+
+            if (
+                searchRef.current &&
+                !(searchRef.current as any).contains(target)
+            ) {
+                setOpenSearch(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('pointerdown', handleClickOutside, true);
 
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            window.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener(
+                'pointerdown',
+                handleClickOutside,
+                true,
+            );
         };
     }, []);
-    //
 
     return (
         <header className="sticky top-0 z-50 border-b border-white/5 bg-black/80 backdrop-blur">
@@ -135,6 +155,7 @@ const Navbar: React.FC = () => {
                                 onClick={() => setOpenSearch(true)}
                                 className="cursor-pointer transition hover:text-white"
                                 aria-label="Search"
+                                ref={searchRef}
                             >
                                 <svg
                                     aria-hidden="true"
@@ -163,8 +184,107 @@ const Navbar: React.FC = () => {
                                 </svg>
                             </button>
 
+                            {/* Search Overlay */}
+                            <div
+                                className={`fixed inset-0 z-[70] transition ${
+                                    openSearch ? 'visible' : 'invisible'
+                                }`}
+                            >
+                                {/* Backdrop */}
+                                <div
+                                    onClick={() => setOpenSearch(false)}
+                                    className={`absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${
+                                        openSearch ? 'opacity-100' : 'opacity-0'
+                                    }`}
+                                />
+
+                                {/* Floating Panel */}
+                                <div
+                                    className={`absolute top-20 left-1/2 w-[90%] max-w-[900px] -translate-x-1/2 transform transition-all duration-300 ease-out ${openSearch ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0'} `}
+                                >
+                                    <div className="rounded-2xl border border-white/10 bg-[#0b0d10] px-6 py-5 shadow-2xl">
+                                        {/* Input Row */}
+                                        <div className="flex items-center gap-3">
+                                            {/* Search Input */}
+                                            <div className="flex flex-1 items-center gap-3 rounded-full bg-white/10 px-5 py-3">
+                                                <svg
+                                                    className="h-5 w-5 text-white/50"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="2"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
+                                                    />
+                                                </svg>
+
+                                                <input
+                                                    autoFocus
+                                                    type="text"
+                                                    placeholder="What are we looking for?"
+                                                    className="flex-1 bg-transparent text-white outline-none placeholder:text-white/40"
+                                                />
+                                            </div>
+
+                                            {/* Search Button */}
+                                            <button className="flex h-11 w-11 items-center justify-center rounded-full bg-red-600 transition hover:bg-red-500">
+                                                <svg
+                                                    className="h-5 w-5 text-white"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="2"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
+                                                    />
+                                                </svg>
+                                            </button>
+
+                                            {/* Close Button */}
+                                            <button
+                                                onClick={() =>
+                                                    setOpenSearch(false)
+                                                }
+                                                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/20"
+                                            >
+                                                <svg
+                                                    className="h-5 w-5 text-white"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="2"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M6 18L18 6M6 6l12 12"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        {/* Error Message */}
+                                        {error && (
+                                            <div className="mt-5 flex justify-center">
+                                                <div className="rounded-full bg-pink-100 px-6 py-2 text-sm text-pink-600">
+                                                    {error}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <FlashSuccess />
+
                             {/* Notification */}
-                            <div className="flex">
+                            <div className="flex" ref={notifDropdownRef}>
                                 <button
                                     onClick={() => setOpenNotif((v) => !v)}
                                     className="relative transition hover:text-white"
@@ -191,7 +311,7 @@ const Navbar: React.FC = () => {
 
                                 {/* Dropdown */}
                                 {openNotif && (
-                                    <div className="absolute right-0 mt-3 w-80 rounded-xl border border-white/10 bg-[#0b0d10] shadow-xl">
+                                    <div className="absolute right-0 mt-10 w-80 rounded-xl border border-white/10 bg-[#0b0d10] shadow-xl">
                                         <div className="border-b border-white/10 px-4 py-3 text-sm font-semibold">
                                             Notifications
                                         </div>
@@ -222,34 +342,50 @@ const Navbar: React.FC = () => {
                             </div>
 
                             {/* Profile */}
-                            <div className="flex" ref={authDropdownRef} >
+                            <div className="flex" ref={authDropdownRef}>
                                 {/* PROFILE BUTTON */}
                                 <button
-                                    className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-emerald-500 text-sm font-bold text-black"
+                                    className={[
+                                        'flex h-8 w-8 items-center justify-center overflow-hidden rounded-full transition',
+                                        auth.user
+                                            ? 'bg-emerald-500 text-black'
+                                            : 'border border-white/20 bg-[#0b0d10] text-white/70 hover:text-white',
+                                    ].join(' ')}
                                     onClick={() => setOpenAuth((v) => !v)}
                                     aria-label="Profile menu"
                                 >
+                                    {/* LOGGED-IN WITH AVATAR */}
                                     {auth.user?.avatar ? (
                                         <img
                                             src={auth.user.avatar}
-                                            alt={auth.user.name}
+                                            alt={auth.user.username}
                                             className="h-full w-full object-cover"
                                         />
+                                    ) : auth.user ? (
+                                        /* LOGGED-IN WITHOUT AVATAR → INITIAL */
+                                        <span className="text-sm font-bold">
+                                            {auth.user.username[0].toUpperCase()}
+                                        </span>
                                     ) : (
-                                        auth.user?.name?.[0]?.toUpperCase() || (
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 24 24"
-                                                fill="currentColor"
-                                                className="h-4 w-4"
-                                            >
-                                                <path
-                                                    fillRule="evenodd"
-                                                    d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
-                                                    clipRule="evenodd"
-                                                />
-                                            </svg>
-                                        )
+                                        /* GUEST ICON */
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24"
+                                            fill="currentColor"
+                                            className="h-4 w-4"
+                                        >
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M7.5 6a4.5 4.5 0 1 1 9 0
+                   4.5 4.5 0 0 1-9 0ZM3.751
+                   20.105a8.25 8.25 0 0 1
+                   16.498 0 .75.75 0 0
+                   1-.437.695A18.683
+                   18.683 0 0 1 12
+                   22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+                                                clipRule="evenodd"
+                                            />
+                                        </svg>
                                     )}
                                 </button>
 
@@ -259,18 +395,18 @@ const Navbar: React.FC = () => {
                                         {/* USER INFO */}
                                         <div className="flex items-center gap-3 rounded-xl bg-white/5 p-3">
                                             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 font-bold text-black">
-                                                {auth.user.name[0].toUpperCase()}
+                                                {auth.user.username[0].toUpperCase()}
                                             </div>
                                             <div className="min-w-0">
                                                 <p className="truncate font-semibold text-white">
-                                                    {auth.user.name}
+                                                    {auth.user.username}
                                                 </p>
                                                 <p className="truncate text-xs text-white/60">
                                                     {auth.user.email}
                                                 </p>
                                             </div>
-                                            <span className="ml-auto rounded bg-white/10 px-2 py-0.5 text-[10px] text-white/70">
-                                                USER
+                                            <span className="ml-auto rounded bg-white/10 px-2 py-0.5 text-[10px] text-white/70 capitalize">
+                                                {auth.user.role}
                                             </span>
                                         </div>
 
@@ -292,6 +428,15 @@ const Navbar: React.FC = () => {
                                             >
                                                 👤 <span>View Profile</span>
                                             </Link>
+
+                                            {auth.user.role === 'admin' && (
+                                                <Link
+                                                    href="/admin/dashboard"
+                                                    className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-white/5"
+                                                >
+                                                    ⚙️ <span>Admin Panel</span>
+                                                </Link>
+                                            )}
 
                                             <Link
                                                 href="/support"
@@ -332,101 +477,6 @@ const Navbar: React.FC = () => {
                                 )}
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Search Overlay */}
-            <div
-                className={`fixed inset-0 z-[70] transition ${
-                    openSearch ? 'visible' : 'invisible'
-                }`}
-            >
-                {/* Backdrop */}
-                <div
-                    onClick={() => setOpenSearch(false)}
-                    className={`absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${
-                        openSearch ? 'opacity-100' : 'opacity-0'
-                    }`}
-                />
-
-                {/* Floating Panel */}
-                <div
-                    className={`absolute top-20 left-1/2 w-[90%] max-w-[900px] -translate-x-1/2 transform transition-all duration-300 ease-out ${openSearch ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0'} `}
-                >
-                    <div className="rounded-2xl border border-white/10 bg-[#0b0d10] px-6 py-5 shadow-2xl">
-                        {/* Input Row */}
-                        <div className="flex items-center gap-3">
-                            {/* Search Input */}
-                            <div className="flex flex-1 items-center gap-3 rounded-full bg-white/10 px-5 py-3">
-                                <svg
-                                    className="h-5 w-5 text-white/50"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
-                                    />
-                                </svg>
-
-                                <input
-                                    autoFocus
-                                    type="text"
-                                    placeholder="What are we looking for?"
-                                    className="flex-1 bg-transparent text-white outline-none placeholder:text-white/40"
-                                />
-                            </div>
-
-                            {/* Search Button */}
-                            <button className="flex h-11 w-11 items-center justify-center rounded-full bg-red-600 transition hover:bg-red-500">
-                                <svg
-                                    className="h-5 w-5 text-white"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
-                                    />
-                                </svg>
-                            </button>
-
-                            {/* Close Button */}
-                            <button
-                                onClick={() => setOpenSearch(false)}
-                                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/20"
-                            >
-                                <svg
-                                    className="h-5 w-5 text-white"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-
-                        {/* Error Message */}
-                        {error && (
-                            <div className="mt-5 flex justify-center">
-                                <div className="rounded-full bg-pink-100 px-6 py-2 text-sm text-pink-600">
-                                    {error}
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>

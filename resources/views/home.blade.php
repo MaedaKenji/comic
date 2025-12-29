@@ -6,6 +6,7 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
     @viteReactRefresh
     @vite(['resources/js/app.tsx', 'resources/css/app.css'])
+    @routes
 </head>
 <body>
     <div id="app" data-page="{{ json_encode($page) }}"></div>
