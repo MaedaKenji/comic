@@ -1,3 +1,4 @@
+import { usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 import 'swiper/css';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -7,7 +8,11 @@ export type HeroItem = {
     title: string;
     cover: string;
     badge?: string;
-    chips?: string[];
+    genre?: string[];
+};
+
+type PageProps = {
+    hero: HeroItem[];
 };
 
 interface Props {
@@ -15,21 +20,18 @@ interface Props {
     onClickItem?: (item: HeroItem) => void;
 }
 
-const HeroSlider: React.FC<Props> = ({ items, onClickItem }) => {
+export default function HeroSlider({ items, onClickItem }: Props) {
     const isDragging = useRef(false);
+    const { hero = [] } = usePage<PageProps>().props;
+    console.log(hero);
 
     return (
         <section className="w-full overflow-hidden">
             <Swiper
-                // modules={[Autoplay]}
                 slidesPerView={3}
                 spaceBetween={12}
                 loop
                 grabCursor
-                // autoplay={{
-                //     delay: 4500,
-                //     disableOnInteraction: false,
-                // }}
                 onTouchMove={() => (isDragging.current = true)}
                 onTouchEnd={() =>
                     setTimeout(() => (isDragging.current = false), 50)
@@ -47,7 +49,7 @@ const HeroSlider: React.FC<Props> = ({ items, onClickItem }) => {
                 }}
                 className="hero-swiper"
             >
-                {items.map((item) => (
+                {hero.map((item) => (
                     <SwiperSlide key={item.id}>
                         <div
                             className="xl:h-[360px]cursor-pointer rounded- relative h-[260px] w-full select-none md:h-[430px]"
@@ -70,24 +72,19 @@ const HeroSlider: React.FC<Props> = ({ items, onClickItem }) => {
 
                             {/* content */}
                             <div className="absolute right-8 bottom-8 left-8">
-                                {/* {item.badge && (
-                                    <span className="relative left-1/2 mx-auto mb-3 block inline-flex w-fit -translate-x-1/2 items-center justify-center rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-black ...">
-                                        🔥 {item.badge}
-                                    </span>
-                                )} */}
-
                                 {item.badge && (
-                                    <span className="relative left-1/2 mx-auto mb-3 block inline-flex w-fit -translate-x-1/2 items-center justify-center rounded-full ... bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 px-3 py-1 text-xs font-semibold text-black shadow-[0_0_12px_rgba(255,140,0,0.6)]">
-                                        🔥 {item.badge}
+                                    <span className="relative left-1/2 mx-auto mb-3 block inline-flex w-fit -translate-x-1/2 items-center justify-center rounded-full bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 px-3 py-1 text-xs font-semibold text-black shadow-[0_0_12px_rgba(255,140,0,0.6)] ...">
+                                        {item.badge}
                                     </span>
                                 )}
 
                                 <h2 className="text-center text-2xl leading-tight font-extrabold text-white drop-shadow xl:text-3xl">
                                     {item.title}
                                 </h2>
-                                {item.chips && (
+
+                                {item.genre && (
                                     <div className="mt-3 flex flex-wrap justify-center gap-2">
-                                        {item.chips.map((c) => (
+                                        {item.genre.map((c) => (
                                             <span
                                                 key={c}
                                                 className="relative inline-flex items-center justify-center"
@@ -110,6 +107,4 @@ const HeroSlider: React.FC<Props> = ({ items, onClickItem }) => {
             </Swiper>
         </section>
     );
-};
-
-export default HeroSlider;
+}

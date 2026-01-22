@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
 
 
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 const container = document.getElementById('app')!;
 

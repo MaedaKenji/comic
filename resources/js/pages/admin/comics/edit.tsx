@@ -1,5 +1,6 @@
 import AdminLayout from '@/layouts/admin-layout';
 import { Head, useForm, usePage } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 type Comic = {
     id: number;

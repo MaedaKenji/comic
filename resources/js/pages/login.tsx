@@ -12,11 +12,10 @@ export default function Login() {
         remember: false,
     });
 
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    post('/login');
-}
-
+    function submit(e: React.FormEvent) {
+        e.preventDefault();
+        post('/login');
+    }
 
     return (
         <>
@@ -111,7 +110,6 @@ export default function Login() {
                                     {errors.email ?? errors.password}
                                 </div>
                             )}
-                            
 
                             <button
                                 type="submit"
@@ -121,6 +119,22 @@ export default function Login() {
                                 {processing ? 'Logging in…' : 'Login'}
                             </button>
                         </form>
+
+                        {/* ERRORS */}
+                        {Object.keys(errors).length > 0 && (
+                            <div className="rounded bg-red-500/10 px-3 py-2 text-xs text-red-300">
+                                {/* Changed 'list-disc' and 'list-inside' to 'list-none' */}
+                                <ul className="list-none">
+                                    {(
+                                        Object.keys(errors) as Array<
+                                            keyof typeof data
+                                        >
+                                    ).map((key) => (
+                                        <li key={key}>{errors[key]}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
 
                         {/* SOCIAL */}
                         <div className="my-4 text-xs text-white/40">

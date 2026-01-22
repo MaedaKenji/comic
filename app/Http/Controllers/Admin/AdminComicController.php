@@ -6,16 +6,26 @@ use App\Http\Controllers\Controller;
 use App\Models\Comic;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class AdminComicController extends Controller
 {
     public function index()
     {
-        return Inertia::render('admin/comics/index', [
-            'comics' => Comic::latest()->get(),
+        return inertia('admin/comics', [
+            'comics' => Comic::latest()->get()->map(function ($comic) {
+                return [
+                    'id' => $comic->id,
+                    'title' => $comic->title,
+                    'author' => $comic->author,
+                    'description' => $comic->description,
+                    'cover_url' => $comic->cover_path
+                        ? asset('storage/' . $comic->cover_path)
+                        : null,
+                ];
+            }),
         ]);
     }
-
     public function create()
     {
         return Inertia::render('admin/comics/create');
@@ -24,15 +34,25 @@ class AdminComicController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'author' => 'nullable|string|max:255',
+            'title' => ['required', 'string', 'max:255'],
+            'author' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'cover' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:4096'],
+            'badge' => ['nullable', 'string', 'max:255'],
+            'genre' => ['required', 'array'],
+            'genre.*' => ['string'],
         ]);
+
+        if ($request->hasFile('cover')) {
+            $data['cover_path'] = $request->file('cover')->store('covers', 'public');
+        }
+
+        // Explicitly remove the 'cover' object before creating
+        unset($data['cover']);
 
         Comic::create($data);
 
-        return redirect()
-            ->route('admin.comics.index')
-            ->with('success', 'Comic created');
+        return redirect()->route('admin.comics.index');
     }
 
     public function edit(Comic $comic)
@@ -44,16 +64,12 @@ class AdminComicController extends Controller
 
     public function update(Request $request, Comic $comic)
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'author' => 'nullable|string|max:255',
-        ]);
-
+        if ($request->hasFile('cover')) {
+            if ($comic->cover_path)
+                Storage::disk('public')->delete($comic->cover_path);
+            $data['cover_path'] = $request->file('cover')->store('covers', 'public');
+        }
         $comic->update($data);
-
-        return redirect()
-            ->route('admin.comics.index')
-            ->with('success', 'Comic updated');
     }
 
     public function destroy(Comic $comic)

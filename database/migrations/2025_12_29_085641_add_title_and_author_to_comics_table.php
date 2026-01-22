@@ -10,14 +10,11 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('comics', function (Blueprint $table) {
-            if (!Schema::hasColumn('comics', 'title')) {
-                $table->string('title');
-            }
-
-            if (!Schema::hasColumn('comics', 'author')) {
-                $table->string('author')->nullable();
-            }
+        Schema::create('comics', function (Blueprint $table) {
+            $table->id(); // Always include an ID
+            $table->string('title');
+            $table->string('author')->nullable();
+            $table->timestamps(); // Adds created_at and updated_at
         });
     }
 

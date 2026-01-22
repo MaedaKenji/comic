@@ -7,4 +7,3 @@ test('guest can open home page', function () {
     $response->assertStatus(200);
 });
 
-php artisan make:middleware AdminOnly

@@ -11,7 +11,7 @@ export type HeroItem = {
   watermark?: string; // e.g. "VORTEX SCANS"
 };
 
-const HeroCard: React.FC<{ item: HeroItem }> = ({ item }) => {
+export default function HeroCard({ item }: { item: HeroItem }) {
   return (
     <div className="relative overflow-hidden rounded-2xl bg-white/5 shadow-[0_10px_40px_rgba(0,0,0,0.55)]">
       {/* Background */}
@@ -19,6 +19,7 @@ const HeroCard: React.FC<{ item: HeroItem }> = ({ item }) => {
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${item.cover})` }}
       />
+      
       {/* Dark overlay + vignette */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
       <div className="absolute inset-0 [box-shadow:inset_0_0_0_1px_rgba(255,255,255,0.06)]" />
@@ -63,6 +64,4 @@ const HeroCard: React.FC<{ item: HeroItem }> = ({ item }) => {
       </div>
     </div>
   );
-};
-
-export default HeroCard;
+}

@@ -1,3 +1,4 @@
+import Coba from '@/components/coba';
 import HeroSlider from '@/components/hero-slider';
 import { Link, usePage } from '@inertiajs/react';
 import React from 'react';
@@ -62,20 +63,20 @@ const popular: MangaItem[] = Array.from({ length: 10 }).map((_, i) => ({
 
 const Home: React.FC = () => {
     const { auth } = usePage().props as any;
-    const isAdmin = auth?.user?.role === 'admin';
 
     return (
         <div className="min-h-screen bg-[#050607] text-white">
             {/* head title */}
             <title>Vortex Manga</title>
-
-            {/* subtle background glow */}
-            <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_0%,rgba(220,38,38,0.18),transparent_40%),radial-gradient(circle_at_90%_10%,rgba(59,130,246,0.10),transparent_35%)]" />
-
             <Navbar />
 
             <main className="mx-auto px-2">
                 {<HeroSlider items={hero} />}
+
+                <Coba></Coba>
+
+
+                
 
                 <HorizontalShelf title="Popular Today">
                     {popular.map((m) => (

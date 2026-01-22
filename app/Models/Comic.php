@@ -7,10 +7,26 @@ use Illuminate\Database\Eloquent\Model;
 
 class Comic extends Model
 {
-    /** @use HasFactory<\Database\Factories\ComicFactory> */
     use HasFactory;
+
     protected $fillable = [
         'title',
         'author',
+        'description',
+        'cover_path',
+        'badge',
+        'genre',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'genre' => 'array',
+        ];
+    }
+
+    public function chapters()
+    {
+        return $this->hasMany(\App\Models\Chapter::class);
+    }
 }
