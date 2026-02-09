@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\ComicResource;
 use App\Http\Requests\UpdateComicRequest;
+use Illuminate\Support\Facades\DB;
 
 class AdminComicController extends Controller
 {
@@ -92,5 +93,43 @@ class AdminComicController extends Controller
         return Inertia::render('admin/comics/show', [
             'comic' => $comic,
         ]);
+    }
+
+    public function uploadChapterImages(Request $request, Comic $comic)
+    {
+        // 1. Validate - Note: 'number' matches your Model fillable
+        $request->validate([
+            'chapter_number' => ['required', 'numeric'],
+            'images' => ['required', 'array'],
+            'images.*.file' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'images.*.order' => ['required', 'integer'],
+        ]);
+
+        return DB::transaction(function () use ($request, $comic) {
+            // 2. Create the Chapter
+            $chapter = $comic->chapters()->create([
+                'number' => $request->chapter_number,
+                'title' => $request->title ?? "Chapter " . $request->chapter_number,
+            ]);
+
+            // 3. Process and Save Pages
+            foreach ($request->file('images') as $index => $imageItem) {
+                $file = $imageItem['file'];
+
+                // Generate a clean path: comics/1/chapters/10/page_1.webp
+                $path = $file->store("comics/{$comic->id}/chapters/{$chapter->id}", 'public');
+
+                // 4. Create ChapterPage entry
+                $chapter->pages()->create([
+                    'page_number' => $request->input("images.$index.order"),
+                    'image_path' => $path,
+                    // Optional: You can get width/height if you want to be fancy
+                    // 'width'    => getimagesize($file)[0],
+                    // 'height'   => getimagesize($file)[1],
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Chapter uploaded successfully!');
+        });
     }
 }

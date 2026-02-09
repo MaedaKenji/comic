@@ -1,140 +1,190 @@
-import { Head } from '@inertiajs/react';
-import { Bookmark, Flag, Star, BookMarked, Pen, User, Calendar } from 'lucide-react';
-import { useState } from 'react';
 import { Comic } from '@/types/comic';
-
-// type Props = {
-//     comic: Comic;
-// };
+import { Head, Link as InertiaLink } from '@inertiajs/react';
+import {
+    Bookmark,
+    BookMarked,
+    Calendar,
+    Flag,
+    Pen,
+    Star,
+    User,
+} from 'lucide-react';
+import { useState } from 'react';
+import { route } from 'ziggy-js';
 
 interface Props {
-    comic : {
-        data : Comic;
+    comic: {
+        data: Comic;
     };
 }
 
-
 export default function Show({ comic }: Props) {
-    const [activeTab, setActiveTab] = useState<'chapters' | 'synopsis' | 'reviews'>('chapters');
+    const [activeTab, setActiveTab] = useState<
+        'chapters' | 'synopsis' | 'reviews'
+    >('chapters');
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredChapters = (comic.data.chapters || []).filter(chapter =>
-        chapter.number.toString().includes(searchQuery) ||
-        chapter.title?.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredChapters = (comic.data.chapters || []).filter(
+        (chapter) =>
+            chapter.number.toString().includes(searchQuery) ||
+            chapter.title?.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
     const getTimeAgo = (date: string) => {
-        const days = Math.floor((Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24));
+        const days = Math.floor(
+            (Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24),
+        );
         if (days === 0) return 'Today';
         if (days === 1) return '1 day';
         if (days < 30) return `${days} days`;
-        if (days < 365) return `over ${Math.floor(days / 30)} month${Math.floor(days / 30) > 1 ? 's' : ''}`;
+        if (days < 365)
+            return `over ${Math.floor(days / 30)} month${Math.floor(days / 30) > 1 ? 's' : ''}`;
         return `over ${Math.floor(days / 365)} year${Math.floor(days / 365) > 1 ? 's' : ''}`;
     };
-    console.log("From pages/comics/show.tsx - comic:", comic);
-    
 
     return (
         <>
             <Head title={comic.data.title} />
-            
+
             <div className="min-h-screen bg-black text-white">
                 <div className="container mx-auto px-4 py-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+                    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[280px_1fr]">
                         {/* Left Sidebar */}
                         <div className="space-y-4">
                             {/* Cover Image */}
-                            <div className="relative rounded-lg overflow-hidden">
+                            <div className="relative overflow-hidden rounded-lg">
                                 <img
                                     src={comic.data.cover || ''}
                                     alt={comic.data.title}
-                                    className="w-full h-auto object-cover"
+                                    className="h-auto w-full object-cover"
                                 />
                             </div>
 
                             {/* Action Buttons */}
-                            <button className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition">
-                                Read Chapter 
+                            <button className="w-full rounded-lg bg-red-600 py-3 font-semibold text-white transition hover:bg-red-700">
+                                Read Chapter
                             </button>
 
-                            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2">
+                            {/* Bookmarks */}
+                            <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700">
                                 <Bookmark size={18} />
                                 Bookmark
                             </button>
 
-                            <button className="w-full bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2">
+                            {/* Report Issue */}
+                            <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-800 py-3 font-semibold text-white transition hover:bg-gray-700">
                                 <Flag size={18} />
                                 Report Issue
                             </button>
 
                             {/* Ratings */}
-                            <div className="flex items-center justify-around py-4 bg-gray-900 rounded-lg">
+                            <div className="flex items-center justify-around rounded-lg bg-gray-900 py-4">
                                 <div className="text-center">
-                                    <div className="flex items-center gap-1 text-yellow-400 text-xl font-bold">
+                                    <div className="flex items-center gap-1 text-xl font-bold text-yellow-400">
                                         <Star size={20} fill="currentColor" />
                                         {comic.data.rating}
                                     </div>
-                                    <div className="text-xs text-gray-400">{comic.data.total_ratings} ratings</div>
+                                    <div className="text-xs text-gray-400">
+                                        {comic.data.total_ratings} ratings
+                                    </div>
                                 </div>
                                 <div className="text-center">
-                                    <div className="flex items-center gap-1 text-blue-400 text-xl font-bold">
+                                    <div className="flex items-center gap-1 text-xl font-bold text-blue-400">
                                         <BookMarked size={20} />
                                         {comic.data.total_favorites}
                                     </div>
-                                    <div className="text-xs text-gray-400">Favorites</div>
+                                    <div className="text-xs text-gray-400">
+                                        Favorites
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Info */}
-                            <div className="space-y-3 text-sm bg-gray-900 rounded-lg p-4">
+                            <div className="space-y-3 rounded-lg bg-gray-900 p-4 text-sm">
                                 <div className="flex items-start gap-3">
-                                    <div className="text-gray-400 w-6">📊</div>
+                                    <div className="w-6 text-gray-400">📊</div>
                                     <div>
-                                        <div className="font-semibold">Status</div>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                                            <span className="text-green-500">{comic.data.status}</span>
+                                        <div className="font-semibold">
+                                            Status
+                                        </div>
+                                        <div className="mt-1 flex items-center gap-2">
+                                            <span className="h-2 w-2 rounded-full bg-green-500"></span>
+                                            <span className="text-green-500">
+                                                {comic.data.status}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="flex items-start gap-3">
-                                    <div className="text-gray-400 w-6">📖</div>
+                                    <div className="w-6 text-gray-400">📖</div>
                                     <div>
-                                        <div className="font-semibold">Type</div>
-                                        <div className="text-gray-300 mt-1">{comic.data.type}</div>
+                                        <div className="font-semibold">
+                                            Type
+                                        </div>
+                                        <div className="mt-1 text-gray-300">
+                                            {comic.data.type}
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div className="flex items-start gap-3">
-                                    <Pen size={18} className="text-gray-400 mt-0.5" />
+                                    <Pen
+                                        size={18}
+                                        className="mt-0.5 text-gray-400"
+                                    />
                                     <div>
-                                        <div className="font-semibold">Author</div>
-                                        <div className="text-gray-300 mt-1">{comic.data.author}</div>
+                                        <div className="font-semibold">
+                                            Author
+                                        </div>
+                                        <div className="mt-1 text-gray-300">
+                                            {comic.data.author}
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div className="flex items-start gap-3">
-                                    <User size={18} className="text-gray-400 mt-0.5" />
+                                    <User
+                                        size={18}
+                                        className="mt-0.5 text-gray-400"
+                                    />
                                     <div>
-                                        <div className="font-semibold">Artist</div>
-                                        <div className="text-gray-300 mt-1">{comic.data.artist}</div>
+                                        <div className="font-semibold">
+                                            Artist
+                                        </div>
+                                        <div className="mt-1 text-gray-300">
+                                            {comic.data.artist}
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div className="flex items-start gap-3">
-                                    <BookMarked size={18} className="text-gray-400 mt-0.5" />
+                                    <BookMarked
+                                        size={18}
+                                        className="mt-0.5 text-gray-400"
+                                    />
                                     <div>
-                                        <div className="font-semibold">Chapters</div>
-                                        <div className="text-gray-300 mt-1">{comic.data.total_chapters}</div>
+                                        <div className="font-semibold">
+                                            Chapters
+                                        </div>
+                                        <div className="mt-1 text-gray-300">
+                                            {comic.data.total_chapters}
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div className="flex items-start gap-3">
-                                    <Calendar size={18} className="text-gray-400 mt-0.5" />
+                                    <Calendar
+                                        size={18}
+                                        className="mt-0.5 text-gray-400"
+                                    />
                                     <div>
-                                        <div className="font-semibold">Last update</div>
-                                        <div className="text-gray-300 mt-1">{comic.data.last_update}</div>
+                                        <div className="font-semibold">
+                                            Last update
+                                        </div>
+                                        <div className="mt-1 text-gray-300">
+                                            {comic.data.last_update}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -145,18 +195,20 @@ export default function Show({ comic }: Props) {
                             {/* Title */}
                             <div>
                                 {comic.data.alt_title && (
-                                    <div className="text-gray-400 text-sm mb-2">{comic.data.alt_title}
+                                    <div className="mb-2 text-sm text-gray-400">
+                                        {comic.data.alt_title}
                                     </div>
-                                    
                                 )}
-                                <h1 className="text-4xl font-bold">{comic.data.title}</h1>
+                                <h1 className="text-4xl font-bold">
+                                    {comic.data.title}
+                                </h1>
                             </div>
 
                             {/* Tabs */}
                             <div className="flex gap-6 border-b border-gray-800">
                                 <button
                                     onClick={() => setActiveTab('chapters')}
-                                    className={`pb-3 font-semibold transition relative ${
+                                    className={`relative pb-3 font-semibold transition ${
                                         activeTab === 'chapters'
                                             ? 'text-red-500'
                                             : 'text-gray-400 hover:text-white'
@@ -164,12 +216,12 @@ export default function Show({ comic }: Props) {
                                 >
                                     📚 Chapters ( {comic.data.total_chapters} )
                                     {activeTab === 'chapters' && (
-                                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500"></div>
+                                        <div className="absolute right-0 bottom-0 left-0 h-0.5 bg-red-500"></div>
                                     )}
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('synopsis')}
-                                    className={`pb-3 font-semibold transition relative ${
+                                    className={`relative pb-3 font-semibold transition ${
                                         activeTab === 'synopsis'
                                             ? 'text-red-500'
                                             : 'text-gray-400 hover:text-white'
@@ -177,20 +229,20 @@ export default function Show({ comic }: Props) {
                                 >
                                     📄 Synopsis
                                     {activeTab === 'synopsis' && (
-                                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500"></div>
+                                        <div className="absolute right-0 bottom-0 left-0 h-0.5 bg-red-500"></div>
                                     )}
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('reviews')}
-                                    className={`pb-3 font-semibold transition relative ${
+                                    className={`relative pb-3 font-semibold transition ${
                                         activeTab === 'reviews'
                                             ? 'text-red-500'
                                             : 'text-gray-400 hover:text-white'
                                     }`}
                                 >
-                                    💬 Reviews (  )
+                                    💬 Reviews ( )
                                     {activeTab === 'reviews' && (
-                                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500"></div>
+                                        <div className="absolute right-0 bottom-0 left-0 h-0.5 bg-red-500"></div>
                                     )}
                                 </button>
                             </div>
@@ -204,10 +256,12 @@ export default function Show({ comic }: Props) {
                                             type="text"
                                             placeholder="Search chapters..."
                                             value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                            className="w-full bg-gray-900 text-white rounded-lg px-4 py-3 pl-10 focus:outline-none focus:ring-2 focus:ring-red-500"
+                                            onChange={(e) =>
+                                                setSearchQuery(e.target.value)
+                                            }
+                                            className="w-full rounded-lg bg-gray-900 px-4 py-3 pl-10 text-white focus:ring-2 focus:ring-red-500 focus:outline-none"
                                         />
-                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                        <div className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400">
                                             🔍
                                         </div>
                                     </div>
@@ -215,28 +269,39 @@ export default function Show({ comic }: Props) {
                                     {/* Chapter List */}
                                     <div className="space-y-2">
                                         {filteredChapters.map((chapter) => (
-                                            <div
+                                            <InertiaLink
                                                 key={chapter.id}
-                                                className="flex items-center gap-4 bg-gray-900 hover:bg-gray-800 rounded-lg p-4 cursor-pointer transition group"
+                                                href={route('comics.reader', {
+                                                    comic: comic.data.slug,
+                                                    chapter: chapter.number,
+                                                })}
+                                                className="group relative flex w-full items-center gap-4 rounded-lg bg-gray-900 p-4 transition hover:bg-gray-800"
                                             >
                                                 <img
                                                     src={comic.data.cover || ''}
                                                     alt={`Chapter ${chapter.number}`}
-                                                    className="w-12 h-12 rounded object-cover"
+                                                    className="relative z-10 h-12 w-12 rounded object-cover"
                                                 />
-                                                <div className="flex-1">
-                                                    <div className="font-semibold group-hover:text-red-500 transition">
+
+                                                <div className="relative z-10 flex-1">
+                                                    <div className="font-semibold transition group-hover:text-red-500">
                                                         Chapter {chapter.number}
                                                     </div>
                                                     <div className="text-sm text-gray-400">
-                                                        {getTimeAgo(chapter.published_at)} ago
+                                                        {getTimeAgo(
+                                                            chapter.published_at,
+                                                        )}{' '}
+                                                        ago
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-1 text-gray-400">
-                                                    <span className="text-red-500">❤</span>
+
+                                                <div className="relative z-10 flex items-center gap-1 text-gray-400">
+                                                    <span className="text-red-500">
+                                                        ❤
+                                                    </span>
                                                     <span>{chapter.likes}</span>
                                                 </div>
-                                            </div>
+                                            </InertiaLink>
                                         ))}
                                     </div>
                                 </div>
@@ -244,47 +309,61 @@ export default function Show({ comic }: Props) {
 
                             {/* Synopsis Tab */}
                             {activeTab === 'synopsis' && (
-                                <div className="bg-gray-900 rounded-lg p-6">
-                                    <p className="text-gray-300 leading-relaxed">
-                                        {comic.data.description || 'No synopsis available.'}
+                                <div className="rounded-lg bg-gray-900 p-6">
+                                    <p className="leading-relaxed text-gray-300">
+                                        {comic.data.description ||
+                                            'No synopsis available.'}
                                     </p>
                                 </div>
                             )}
 
                             {/* Reviews Tab */}
                             {activeTab === 'reviews' && (
-                                <div className="bg-gray-900 rounded-lg p-6 text-center text-gray-400">
-                                    <p>No reviews yet. Be the first to review!</p>
+                                <div className="rounded-lg bg-gray-900 p-6 text-center text-gray-400">
+                                    <p>
+                                        No reviews yet. Be the first to review!
+                                    </p>
                                 </div>
                             )}
 
                             {/* Share Section */}
                             <div className="flex gap-4">
-                                <div className="flex-1 bg-gray-900 rounded-lg p-6">
-                                    <h3 className="font-semibold mb-2">Share Vortex Scans</h3>
-                                    <p className="text-sm text-gray-400 mb-4">to your friends</p>
-                                    <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition">
+                                <div className="flex-1 rounded-lg bg-gray-900 p-6">
+                                    <h3 className="mb-2 font-semibold">
+                                        Share Vortex Scans
+                                    </h3>
+                                    <p className="mb-4 text-sm text-gray-400">
+                                        to your friends
+                                    </p>
+                                    <button className="rounded-lg bg-blue-600 px-6 py-2 font-semibold text-white transition hover:bg-blue-700">
                                         🔗 Share
                                     </button>
                                 </div>
 
-                                <div className="flex-1 bg-gray-900 rounded-lg p-6">
-                                    <h3 className="font-semibold mb-2">Join Our Socials</h3>
-                                    <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded-lg transition mt-7">
+                                <div className="flex-1 rounded-lg bg-gray-900 p-6">
+                                    <h3 className="mb-2 font-semibold">
+                                        Join Our Socials
+                                    </h3>
+                                    <button className="mt-7 rounded-lg bg-indigo-600 px-6 py-2 font-semibold text-white transition hover:bg-indigo-700">
                                         💬 Discord
                                     </button>
                                 </div>
                             </div>
 
                             {/* Discussion */}
-                            <div className="bg-gray-900 rounded-lg p-6">
-                                <div className="flex items-center gap-2 mb-4">
+                            <div className="rounded-lg bg-gray-900 p-6">
+                                <div className="mb-4 flex items-center gap-2">
                                     <span className="text-red-500">💬</span>
-                                    <h3 className="font-semibold">Discussion</h3>
-                                    <span className="text-sm text-gray-400">0 comments</span>
+                                    <h3 className="font-semibold">
+                                        Discussion
+                                    </h3>
+                                    <span className="text-sm text-gray-400">
+                                        0 comments
+                                    </span>
                                 </div>
                                 <p className="text-sm text-gray-400">
-                                    Join the conversation and share your thoughts
+                                    Join the conversation and share your
+                                    thoughts
                                 </p>
                             </div>
                         </div>

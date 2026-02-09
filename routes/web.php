@@ -62,9 +62,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])
     ->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::resource('comics', AdminComicController::class);
-        // asdasdasddas
-        // Route::get('/comics/{comic}/edit', [AdminComicController::class, 'edit'])->name('admin.comics.edit');
-        // Route::post('/comics/{comic}', [AdminComicController::class, 'update'])->name('admin.comics.update');
+        Route::post('/comics/{comic}/chapters', [AdminComicController::class, 'uploadChapterImages'])
+            ->name('comics.chapters.store');
     });
 Route::redirect('/admin', '/admin/dashboard');
 
@@ -77,5 +76,10 @@ Route::middleware('auth')->group(function () {
 // Go to that comic page
 Route::get('/comics/{comic:slug}', [ComicController::class, 'show'])
     ->name('comics.show');
+// Route::get('/comics/{comic:slug}/chapters/{chapter:number}', [ComicController::class, 'showChapter'])
+//     ->name('comics.chapters.show');
+Route::get('/comics/{comic}/{chapter}', [ComicController::class, 'reader'])
+    ->name('comics.reader');
+
 
 
