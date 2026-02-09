@@ -7,30 +7,21 @@ use App\Models\Comic;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\ComicResource;
+use App\Http\Requests\UpdateComicRequest;
 
 class AdminComicController extends Controller
 {
     public function index()
     {
         return inertia('admin/comics', [
-            'comics' => Comic::latest()->get()->map(function ($comic) {
-                return [
-                    'id' => $comic->id,
-                    'title' => $comic->title,
-                    'author' => $comic->author,
-                    'description' => $comic->description,
-                    'cover_url' => $comic->cover_path
-                        ? asset('storage/' . $comic->cover_path)
-                        : null,
-                ];
-            }),
+            'comics' => ComicResource::collection(Comic::latest()->get()),
         ]);
     }
     public function create()
     {
         return Inertia::render('admin/comics/create');
     }
-
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -62,20 +53,44 @@ class AdminComicController extends Controller
         ]);
     }
 
-    public function update(Request $request, Comic $comic)
+    public function update(UpdateComicRequest $request, Comic $comic)
     {
+        $data = $request->validated();
+
+        // Handle cover upload
         if ($request->hasFile('cover')) {
-            if ($comic->cover_path)
+            // delete old
+            if ($comic->cover_path) {
                 Storage::disk('public')->delete($comic->cover_path);
+            }
+
+            // store new
             $data['cover_path'] = $request->file('cover')->store('covers', 'public');
         }
-        $comic->update($data);
-    }
 
+        // Don't accidentally try to store the file object into DB
+        unset($data['cover']);
+
+        $comic->update($data);
+
+        return redirect()
+            ->route('admin.comics.edit', $comic)
+            ->with('success', 'Comic updated successfully.');
+    }
     public function destroy(Comic $comic)
     {
+        if ($comic->cover_path) {
+            Storage::disk('public')->delete($comic->cover_path);
+        }
         $comic->delete();
 
-        return back()->with('success', 'Comic deleted');
+        return redirect()->route('admin.comics.index');
+    }
+
+    public function show(Comic $comic)
+    {
+        return Inertia::render('admin/comics/show', [
+            'comic' => $comic,
+        ]);
     }
 }

@@ -1,9 +1,9 @@
-import { usePage, Link } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
+import { Link } from 'lucide-react';
 import { useRef } from 'react';
 import { SwiperSlide } from 'swiper/react';
 import { Swiper } from 'swiper/react';
-import 'swiper/css';
-import { route } from 'ziggy-js';
+import 'swiper/css'; // Must import swiper styles
 
 
 export type HeroItem = {
@@ -12,7 +12,6 @@ export type HeroItem = {
     cover: string;
     badge?: string;
     genre?: string[];
-    slug: string;
 };
 
 type PageProps = {
@@ -54,14 +53,13 @@ export default function HeroSlider({ onClickItem }: Props) {
             >
                 {hero.map((item) => (
                     <SwiperSlide key={item.id}>
-                        <Link
-                            // href={`/comics/${item.id}`}
-                            href={route('comics.show', { comic: item.slug })}
-                            className="block relative h-[260px] w-full cursor-pointer select-none md:h-[430px] xl:h-[360px] rounded-lg"
-                            onClick={(e) => {
-                                if (isDragging.current) {
-                                    e.preventDefault();
+                        <div
+                            className="rounded- relative h-[260px] w-full cursor-pointer select-none md:h-[430px] xl:h-[360px]"
+                            onClick={() => {
+                                if (!isDragging.current) {
+                                    <Link href={`/comics/${item.id}`}></Link>
                                 }
+                                console.log(isDragging.current);
                             }}
                         >
                             {/* image */}
@@ -73,12 +71,12 @@ export default function HeroSlider({ onClickItem }: Props) {
                             />
 
                             {/* overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent rounded-lg" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
                             {/* content */}
                             <div className="absolute right-8 bottom-8 left-8">
                                 {item.badge && (
-                                    <span className="relative left-1/2 mx-auto mb-3 block inline-flex w-fit -translate-x-1/2 items-center justify-center rounded-full bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 px-3 py-1 text-xs font-semibold text-black shadow-[0_0_12px_rgba(255,140,0,0.6)]">
+                                    <span className="relative left-1/2 mx-auto mb-3 block inline-flex w-fit -translate-x-1/2 items-center justify-center rounded-full bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 px-3 py-1 text-xs font-semibold text-black shadow-[0_0_12px_rgba(255,140,0,0.6)] ...">
                                         {item.badge}
                                     </span>
                                 )}
@@ -106,7 +104,7 @@ export default function HeroSlider({ onClickItem }: Props) {
                                     </div>
                                 )}
                             </div>
-                        </Link>
+                        </div>
                     </SwiperSlide>
                 ))}
             </Swiper>

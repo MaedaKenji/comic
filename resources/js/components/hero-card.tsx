@@ -19,7 +19,7 @@ export default function HeroCard({ item }: { item: HeroItem }) {
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${item.cover})` }}
       />
-      
+     
       {/* Dark overlay + vignette */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
       <div className="absolute inset-0 [box-shadow:inset_0_0_0_1px_rgba(255,255,255,0.06)]" />

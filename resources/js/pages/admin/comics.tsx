@@ -1,17 +1,21 @@
 import AdminLayout from '@/layouts/admin-layout';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
+import { Comic } from '@/types/comic';
 
-type Comic = {
-    id: number;
-    title: string;
-    author?: string;
-    description?: string;
-    cover_url?: string;
-};
+interface PaginationProps {
+    comics: {
+        data: Comic[];
+        current_page: number;
+        last_page: number;
+        links: any[]; // Laravel pagination usually includes this
+        total: number;
+    };
+}
 
-export default function IndexComic() {
-    const { comics } = usePage<{ comics: Comic[] }>().props;
+
+export default function IndexComic({ comics }: PaginationProps) {
+    console.log("From pages/admin/comics.tsx - comics:", comics);
 
     return (
         <AdminLayout>
@@ -28,16 +32,16 @@ export default function IndexComic() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                    {comics.map((comic) => (
+                    {comics.data.map((comic) => (
                         <div
                             key={comic.id}
                             className="flex flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5"
                         >
                             {/* Cover Image */}
                             <div className="aspect-[3/4] w-full bg-slate-800">
-                                {comic.cover_url ? (
+                                {comic.cover ? (
                                     <img
-                                        src={comic.cover_url}
+                                        src={comic.cover}
                                         alt={comic.title}
                                         className="h-full w-full object-cover"
                                     />
@@ -64,7 +68,7 @@ export default function IndexComic() {
                             {/* Actions */}
                             <div className="flex gap-2 p-4 pt-0">
                                 <Link
-                                    href={route('admin.comics.edit', comic.id)}
+                                    href={route('admin.comics.edit', comic.slug)}
                                     className="flex-1 rounded-md bg-white/10 py-2 text-center text-xs hover:bg-white/20"
                                 >
                                     Edit

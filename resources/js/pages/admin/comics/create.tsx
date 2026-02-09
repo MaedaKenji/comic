@@ -4,22 +4,7 @@ import React from 'react';
 import { route } from 'ziggy-js';
 
 export default function CreateComic() {
-    // const { data, setData, post, processing, errors, reset } = useForm<{
-    //     title: string;
-    //     author: string;
-    //     description: string;
-    //     cover: File | null;
-    //     genre: string;
-    //     badge?: string;
-    // }>({
-    //     title: '',
-    //     author: '',
-    //     description: '',
-    //     badge: '',
-    //     cover: null,
-    //     genre: '',
-    // });
-
+ 
     interface ComicForm {
         title: string;
         author: string;
@@ -245,8 +230,6 @@ function Input({
                 {required && <span className="ml-1 text-red-500">*</span>}
             </label>
 
-            {/* Jika ada children (untuk Genre), tampilkan children. 
-                Jika tidak, tampilkan input default */}
             {children ? (
                 children
             ) : (

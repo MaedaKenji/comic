@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Comic extends Model
 {
@@ -28,5 +29,17 @@ class Comic extends Model
     public function chapters()
     {
         return $this->hasMany(\App\Models\Chapter::class);
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($comic) {
+            $comic->slug = Str::slug($comic->title);
+        });
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
     }
 }

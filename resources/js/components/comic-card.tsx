@@ -1,13 +1,9 @@
 import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
+import {Comic } from '@/types/comic';
 
-type Comic = {
-    id: number;
-    title: string;
-    author?: string;
-    description?: string;
-    cover_url?: string;
-};
+
+
 
 type ComicCardProps = {
     comic: Comic;
@@ -47,7 +43,7 @@ export default function ComicCard({ comic }: ComicCardProps) {
             {/* Actions */}
             <div className="flex gap-2 p-4 pt-0">
                 <Link
-                    href={route('admin.comics.edit', comic.id)}
+                    href={route('admin.comics.edit', comic.slug)}
                     className="flex-1 rounded-md bg-white/10 py-2 text-center text-xs hover:bg-white/20"
                 >
                     Edit

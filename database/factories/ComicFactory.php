@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Comic;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -14,10 +15,15 @@ class ComicFactory extends Factory
      *
      * @return array<string, mixed>
      */
+
+    protected $model = Comic::class;
+
     public function definition(): array
     {
         return [
-            //
+            'title' => $this->faker->sentence(3),
+            'cover_path' => null,
+            'description' => $this->faker->paragraph(), 
         ];
     }
 }

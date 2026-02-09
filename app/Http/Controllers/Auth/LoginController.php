@@ -40,4 +40,22 @@ class LoginController extends Controller
 
         return redirect()->route('home');
     }
+
+    public function logout(Request $request)
+    {
+        $user = Auth::user();
+
+        // Clear the session_id on logout
+        if ($user) {
+            $user->session_id = null;
+            $user->save();
+        }
+
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home');
+    }
 }

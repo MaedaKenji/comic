@@ -26,23 +26,17 @@ Route::get('/', function () {
                 'cover' => $comic->cover_path
                     ? asset('storage/' . $comic->cover_path)
                     : null,
-                'link' => route('comics.show', $comic->id),
                 'badge' => $comic->badge,
                 'genre' => $comic->genre,
+                'slug' => $comic->slug,
             ];
         });
 
     return Inertia::render('home', [
         'hero' => $hero,
     ]);
-});
-
-Route::get('/home', function () {
-    return Inertia::render('home');
 })->name('home');
 
-Route::get('/comics/{comic}', [ComicController::class, 'show'])
-    ->name('comics.show');
 
 Route::post('/register', [RegisterController::class, 'store']);
 Route::get('/register', function () {
@@ -67,27 +61,21 @@ Route::middleware(['auth', 'verified', 'role:admin'])
     ->name('admin.')
     ->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-        
-        // This single line handles index, create, store, show, edit, update, and destroy
         Route::resource('comics', AdminComicController::class);
+        // asdasdasddas
+        // Route::get('/comics/{comic}/edit', [AdminComicController::class, 'edit'])->name('admin.comics.edit');
+        // Route::post('/comics/{comic}', [AdminComicController::class, 'update'])->name('admin.comics.update');
     });
-
-
-
 Route::redirect('/admin', '/admin/dashboard');
 
-
-
-
-
-
-// Protected
-// Route::middleware('auth')->group(function () {
-//     Route::get('/profile', Profile::class);
-// });
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', fn() => Inertia::render('Profile'));
 });
+
+
+// Go to that comic page
+Route::get('/comics/{comic:slug}', [ComicController::class, 'show'])
+    ->name('comics.show');
 
 
