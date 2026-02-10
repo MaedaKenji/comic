@@ -2,7 +2,6 @@ import { Link, router, usePage } from '@inertiajs/react';
 import React, { useEffect, useRef, useState } from 'react';
 import FlashSuccess from './flash-popup';
 
-
 const Navbar: React.FC = () => {
     const [openSearch, setOpenSearch] = useState(false);
     const [openNotif, setOpenNotif] = useState(false);
@@ -13,15 +12,11 @@ const Navbar: React.FC = () => {
     const notifDropdownRef = useRef<HTMLDivElement>(null);
     const searchRef = useRef(null);
 
-    type NavItem = { label: string; href?: string; active?: boolean };
-
     const items = [
-        { label: 'Home', href: '/', active: true },
+        { label: 'Home', href: '/', active: false },
         { label: 'Series', href: '/series' },
         { label: 'Novels', href: '/novels' },
     ];
-
-    const { flash } = usePage().props as any;
 
     {
         auth.user ? (
@@ -89,18 +84,19 @@ const Navbar: React.FC = () => {
                     <div className="flex min-w-[220px] items-center gap-3">
                         {/* logo*/}
                         <a href="/">
-                            <div>
+                            <div className="flex items-center gap-3">
                                 <img
                                     src="https://storage.vexmanga.com/public/upload/2024/12/02/Logo-d426c8cb30892710.webp"
                                     alt="Logo"
                                     width={48}
                                     height={48}
+                                    className="shrink-0"
                                 />
+                                <span className="font-gotham text-lg font-bold tracking-wide text-white">
+                                    Vortex Scans
+                                </span>
                             </div>
                         </a>
-                        <span className="font-gotham text-lg font-bold tracking-wide text-white">
-                            Vortex Scans
-                        </span>
                     </div>
 
                     {/* Center: Menu */}

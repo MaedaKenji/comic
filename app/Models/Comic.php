@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Comic extends Model
 {
@@ -41,5 +42,11 @@ class Comic extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function bookmarks(): BelongsToMany
+    {
+        // This assumes you have a pivot table named 'bookmark_comic' or similar
+        return $this->belongsToMany(User::class, 'bookmarks');
     }
 }

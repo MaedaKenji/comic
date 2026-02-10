@@ -1,67 +1,22 @@
 import HeroSlider from '@/components/hero-slider';
+import HorizontalShelf from '@/components/horizontal-shelf';
+import MangaCard from '@/components/manga-card';
+import { MangaItem } from '@/types/manga';
+import Navbar from '@/components/navbar';
+import { User } from '@/types/auth/user';
 import { Link, usePage } from '@inertiajs/react';
 import React from 'react';
-import { HeroItem } from '../components/hero-card';
-import HorizontalShelf from '../components/horizontal-shelf';
-import MangaCard, { MangaItem } from '../components/manga-card';
-import Navbar from '../components/navbar';
+import { route } from 'ziggy-js';
 
-// const hero: HeroItem[] = [
-//     {
-//         id: 1,
-//         title: 'Talk To Your Favorite Characters',
-//         cover: 'https://storage.vexmanga.com/public/upload/2025/05/26/369150fe-85b2-45fa-91a7-afb60c12dfd5.webp',
-//         chips: ['∞ Unlimited chats', '🎧 Voice calls', '🛡️ Ad-free forever'],
-//         watermark: 'VORTEX SCANS',
-//     },
-//     {
-//         id: 2,
-//         title: "Barbarian's Adventure In A Fantasy World",
-//         cover: 'https://storage.vexmanga.com/public/upload/2025/05/26/369150fe-85b2-45fa-91a7-afb60c12dfd5.webp',
-//         badge: 'Hot',
-//         chips: ['Action', 'Manhwa'],
-//         watermark: 'VORTEX SCANS',
-//     },
-//     {
-//         id: 3,
-//         title: 'Return Of The Apocalypse-Class Death Knight',
-//         cover: 'https://storage.vexmanga.com/public/upload/2025/05/26/369150fe-85b2-45fa-91a7-afb60c12dfd5.webp',
-//         badge: 'Hot',
-//         chips: ['Action', 'Revenge'],
-//         watermark: 'VORTEX SCANS',
-//     },
-//     {
-//         id: 4,
-//         title: 'The Legendary Mechanic',
-//         cover: 'https://storage.vexmanga.com/public/upload/2025/05/26/369150fe-85b2-45fa-91a7-afb60c12dfd5.webp',
-//         chips: ['Sci-fi', 'Game'],
-//         watermark: 'VORTEX SCANS',
-//     },
-//     {
-//         id: 5,
-//         title: 'The Strongest Florist',
-//         cover: 'https://storage.vexmanga.com/public/upload/2025/05/26/369150fe-85b2-45fa-91a7-afb60c12dfd5.webp',
-//         chips: ['Romance', 'Comedy'],
-//         watermark: 'VORTEX SCANS',
-//     },
-//     {
-//         id: 6,
-//         title: 'The Villainess Reverses The Hourglass',
-//         cover: 'https://storage.vexmanga.com/public/upload/2025/05/26/369150fe-85b2-45fa-91a7-afb60c12dfd5.webp',
-//         badge: 'Hot',
-//         chips: ['Drama', 'Revenge'],
-//         watermark: 'VORTEX SCANS',
-//     },
-// ];
-
-const popular: MangaItem[] = Array.from({ length: 10 }).map((_, i) => ({
-    id: i + 1,
-    title: `Popular Title ${i + 1}`,
-    cover: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80',
-}));
+interface HomeProps {
+    popular: MangaItem[];
+    auth: { user: User };
+}
 
 const Home: React.FC = () => {
+    const props = usePage().props as unknown as HomeProps;
     const { auth } = usePage().props as any;
+    const { popular } = props;
 
     return (
         <div className="min-h-screen bg-[#050607] text-white">
@@ -70,11 +25,17 @@ const Home: React.FC = () => {
             <Navbar />
 
             <main className="mx-auto px-2">
-                {<HeroSlider/>}
-                
-                <HorizontalShelf title="Popular Today">
-                    {popular.map((m) => (
-                        <MangaCard key={m.id} item={m} />
+                {<HeroSlider />}
+
+                <HorizontalShelf title="Popular">
+                    {popular.map((manga) => (
+                        <Link
+                            key={manga.id}
+                            href={route('comics.show', { comic: manga.slug })}
+                            className="flex-shrink-0 transition hover:opacity-90"
+                        >
+                            <MangaCard item={manga} />
+                        </Link>
                     ))}
                 </HorizontalShelf>
 

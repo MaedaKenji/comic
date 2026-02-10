@@ -1,10 +1,7 @@
 import React from "react";
+import { MangaItem } from "@/types/manga";
 
-export type MangaItem = {
-  id: number;
-  title: string;
-  cover: string;
-};
+
 
 const MangaCard: React.FC<{ item: MangaItem }> = ({ item }) => {
   return (

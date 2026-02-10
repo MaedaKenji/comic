@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\ComicResource;
 use App\Http\Requests\UpdateComicRequest;
 use Illuminate\Support\Facades\DB;
+use Intervention\Image\Laravel\Facades\Image;
 
 class AdminComicController extends Controller
 {
@@ -97,39 +98,47 @@ class AdminComicController extends Controller
 
     public function uploadChapterImages(Request $request, Comic $comic)
     {
-        // 1. Validate - Note: 'number' matches your Model fillable
         $request->validate([
             'chapter_number' => ['required', 'numeric'],
             'images' => ['required', 'array'],
-            'images.*.file' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'images.*.file' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:10240'], // Increased to 10MB since we compress it anyway
             'images.*.order' => ['required', 'integer'],
         ]);
 
         return DB::transaction(function () use ($request, $comic) {
-            // 2. Create the Chapter
-            $chapter = $comic->chapters()->create([
-                'number' => $request->chapter_number,
-                'title' => $request->title ?? "Chapter " . $request->chapter_number,
-            ]);
+            // 1. Create or Update the Chapter
+            $chapter = $comic->chapters()->updateOrCreate(
+                ['number' => $request->chapter_number],
+                ['title' => $request->title ?? "Chapter " . $request->chapter_number]
+            );
 
-            // 3. Process and Save Pages
             foreach ($request->file('images') as $index => $imageItem) {
                 $file = $imageItem['file'];
 
-                // Generate a clean path: comics/1/chapters/10/page_1.webp
-                $path = $file->store("comics/{$comic->id}/chapters/{$chapter->id}", 'public');
+                // 2. Process the Image
+                // We read the file, resize if it's too huge, and encode to WebP
+                $img = Image::read($file);
 
-                // 4. Create ChapterPage entry
+                // Industry Tip: Resize if width > 1600px to maintain quality but reduce weight
+                $img->scale(width: 1600);
+
+                // 3. Prepare Path & Filename
+                $filename = "page_" . time() . "_" . $index . ".webp";
+                $directory = "comics/{$comic->id}/chapters/{$chapter->id}";
+                $fullPath = "{$directory}/{$filename}";
+
+                // 4. Save to Storage (Compressed)
+                // quality 75-80 is the sweet spot for comics
+                Storage::disk('public')->put($fullPath, $img->encodeByExtension('webp', quality: 80));
+
+                // 5. Create ChapterPage entry
                 $chapter->pages()->create([
                     'page_number' => $request->input("images.$index.order"),
-                    'image_path' => $path,
-                    // Optional: You can get width/height if you want to be fancy
-                    // 'width'    => getimagesize($file)[0],
-                    // 'height'   => getimagesize($file)[1],
+                    'image_path' => $fullPath,
                 ]);
             }
 
-            return redirect()->back()->with('success', 'Chapter uploaded successfully!');
+            return redirect()->back()->with('success', 'Chapter uploaded and optimized successfully!');
         });
     }
 }

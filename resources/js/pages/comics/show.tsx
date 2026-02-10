@@ -1,3 +1,4 @@
+import Navbar from '@/components/navbar';
 import { Comic } from '@/types/comic';
 import { Head, Link as InertiaLink } from '@inertiajs/react';
 import {
@@ -45,6 +46,8 @@ export default function Show({ comic }: Props) {
     return (
         <>
             <Head title={comic.data.title} />
+
+            <Navbar></Navbar>
 
             <div className="min-h-screen bg-black text-white">
                 <div className="container mx-auto px-4 py-8">
@@ -373,27 +376,3 @@ export default function Show({ comic }: Props) {
         </>
     );
 }
-
-// Example usage with sample data
-// Show.defaultProps = {
-//     comic: {
-//         id: 1,
-//         title: 'Hardcore Leveling Warrior: Earth Game',
-//         subtitle: '열렙전사 3부',
-//         cover: 'https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=300&h=400&fit=crop',
-//         description: 'The legendary Hardcore Leveling Warrior returns in an epic new adventure...',
-//         status: 'Ongoing',
-//         type: 'Manhwa',
-//         author: 'Kim sehoon (김세훈)',
-//         artist: 'Kim sehoon (김세훈)',
-//         total_chapters: 123,
-//         rating: 4.28,
-//         total_ratings: 1234,
-//         total_favorites: 591,
-//         last_update: '4 days ago',
-//         chapters: [
-//             { id: 121, number: 121, title: 'Chapter 121', published_at: '2026-01-22', likes: 12 },
-//             { id: 21, number: 21, title: 'Chapter 21', published_at: '2025-01-26', likes: 51 },
-//         ]
-//     }
-// }

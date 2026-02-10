@@ -11,31 +11,10 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminComicController;
 use App\Http\Controllers\ComicController;
+use App\Http\Controllers\HomeController;
 
 
-Route::get('/', function () {
-    $hero = Comic::latest()
-        ->take(5)
-        ->get()
-        ->map(function ($comic) {
-            return [
-                'id' => $comic->id,
-                'title' => $comic->title,
-                'author' => $comic->author,
-                'description' => $comic->description,
-                'cover' => $comic->cover_path
-                    ? asset('storage/' . $comic->cover_path)
-                    : null,
-                'badge' => $comic->badge,
-                'genre' => $comic->genre,
-                'slug' => $comic->slug,
-            ];
-        });
-
-    return Inertia::render('home', [
-        'hero' => $hero,
-    ]);
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
 Route::post('/register', [RegisterController::class, 'store']);
