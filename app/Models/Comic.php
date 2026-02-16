@@ -15,9 +15,14 @@ class Comic extends Model
         'title',
         'author',
         'description',
+        'alt_title',
+        'artist',
+        'status',
+        'type',
         'cover_path',
         'badge',
         'genre',
+
     ];
 
     protected function casts(): array

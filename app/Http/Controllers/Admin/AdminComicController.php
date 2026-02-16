@@ -76,7 +76,7 @@ class AdminComicController extends Controller
         $comic->update($data);
 
         return redirect()
-            ->route('admin.comics.edit', $comic)
+            ->route('admin.comics.index', $comic)
             ->with('success', 'Comic updated successfully.');
     }
     public function destroy(Comic $comic)

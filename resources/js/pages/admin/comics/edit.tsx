@@ -25,55 +25,35 @@ interface ChapterImage {
 export default function EditComic() {
     const { comic } = usePage<{ comic: Comic }>().props;
 
-    const form = useForm<ComicFormData>({
-        title: comic.title ?? '',
-        alt_title: comic.alt_title ?? '',
-        author: comic.author ?? '',
-        artist: comic.artist ?? '',
-        status: comic.status ?? '',
-        type: comic.type ?? '',
+    const { data, setData, put, processing, errors } = useForm({
+        title: comic.title,
+        author: comic.author,
+        description: comic.description,
+        alt_title: comic.alt_title,
+        artist: comic.artist,
+        status: comic.status,
+        type: comic.type,
+
+        cover: null as File | null,
     });
 
-    const { data, setData, put, processing, errors, setError, clearErrors } =
-        form;
+    console.log(data);
 
     // Chapter image upload state
     const [chapterNumber, setChapterNumber] = useState<string>('');
     const [chapterImages, setChapterImages] = useState<ChapterImage[]>([]);
 
-    function validate(): boolean {
-        clearErrors();
-
-        const parsed = comicSchema.safeParse(data);
-        if (parsed.success) return true;
-
-        // Map Zod issues to Inertia form errors
-        const fieldErrors: Record<string, string> = {};
-        for (const issue of parsed.error.issues) {
-            const key = issue.path.join('.') || 'form';
-            // keep first error per field
-            if (!fieldErrors[key]) fieldErrors[key] = issue.message;
-        }
-        setError(fieldErrors);
-        return false;
-    }
-
-    function onSubmit(e: React.FormEvent) {
+    const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!validate()) return;
 
-        put(route('admin.comics.update', comic.id), {
-            preserveScroll: true,
+        put(route('admin.comics.update', comic.slug), {
             forceFormData: true,
+            preserveScroll: true,
             onSuccess: () => {
                 alert('Comic updated successfully.');
             },
-            onError: (errs) => {
-                console.error(errs);
-                alert('Update failed.');
-            },
         });
-    }
+    };
 
     function onDelete() {
         const ok = confirm('Are you sure you want to delete this comic?');
@@ -216,7 +196,8 @@ export default function EditComic() {
                         <Input
                             label="Author"
                             name="author"
-                            value={data.author}
+                            required={true}
+                            value={data.author ?? ''}
                             error={errors.author}
                             onChange={(e) => setData('author', e.target.value)}
                             autoComplete="off"
@@ -230,24 +211,57 @@ export default function EditComic() {
                             onChange={(e) => setData('artist', e.target.value)}
                             autoComplete="off"
                         />
-
-                        <Input
-                            label="Status (e.g., Ongoing, Completed)"
+                        {/* Status */}
+                        <Select
+                            label="Status"
                             name="status"
+                            required
                             value={data.status ?? ''}
                             error={errors.status}
                             onChange={(e) => setData('status', e.target.value)}
-                            autoComplete="off"
-                        />
-
-                        <Input
-                            label="Type (e.g., Manhwa, Manga, Manhua)"
+                        >
+                            <option value="" disabled>
+                                Select a status
+                            </option>
+                            <option value="Ongoing">Ongoing</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Hiatus">Hiatus</option>
+                            <option value="Dropped">Dropped</option>
+                        </Select>
+                        {/* Type */}
+                        <Select
+                            label="Type"
                             name="type"
+                            required
                             value={data.type ?? ''}
                             error={errors.type}
                             onChange={(e) => setData('type', e.target.value)}
-                            autoComplete="off"
-                        />
+                        >
+                            <option value="" disabled>
+                                Select a type
+                            </option>
+                            <option value="Manga">Manga</option>
+                            <option value="Manhwa">Manhwa</option>
+                            <option value="Manhua">Manhua</option>
+                            <option value="Comic">Comic</option>
+                            <option value="Novel">Novel</option>
+                        </Select>
+
+                        <div className="space-y-2">
+                            <label className="block text-sm">Cover Image</label>
+                            <input
+                                type="file"
+                                name="cover"
+                                onChange={(e) =>
+                                    setData(
+                                        'cover',
+                                        e.target.files?.[0] ?? null,
+                                    )
+                                }
+                                accept="image/webp,image/jpeg,image/png"
+                                className="w-full rounded-lg bg-white/5 px-3 py-2 text-sm ring-1 ring-white/10 outline-none file:mr-4 file:rounded file:border-0 file:bg-red-600 file:px-4 file:py-1 file:text-sm file:text-white hover:file:bg-red-700"
+                            />
+                        </div>
 
                         <div className="flex items-center gap-3 pt-2">
                             <button
@@ -406,6 +420,7 @@ function Input({
     onChange,
     type = 'text',
     autoComplete,
+    required,
 }: {
     label: string;
     name: string;
@@ -414,11 +429,13 @@ function Input({
     onChange: React.ChangeEventHandler<HTMLInputElement>;
     type?: React.HTMLInputTypeAttribute;
     autoComplete?: string;
+    required?: boolean;
 }) {
     return (
         <div className="space-y-1">
             <label htmlFor={name} className="block text-sm">
                 {label}
+                {required && <span className="ml-1 text-red-500">*</span>}
             </label>
 
             <input
@@ -428,8 +445,54 @@ function Input({
                 value={value}
                 onChange={onChange}
                 autoComplete={autoComplete}
-                className="w-full rounded-lg bg-white/5 px-3 py-2 text-sm ring-1 ring-white/10 outline-none focus:ring-2 focus:ring-white/20"
+                className="w-full rounded-lg bg-[#121212] text-white px-3 py-2 text-sm ring-1 ring-white/10 outline-none focus:ring-2 focus:ring-white/20"
             />
+
+            {error && <p className="text-xs text-red-400">{error}</p>}
+        </div>
+    );
+}
+
+type SelectProps = {
+    label: string;
+    name: string;
+    value: string;
+    error?: string;
+    required?: boolean;
+    onChange: React.ChangeEventHandler<HTMLSelectElement>;
+    children: React.ReactNode;
+};
+
+export function Select({
+    label,
+    name,
+    value,
+    error,
+    required,
+    onChange,
+    children,
+}: SelectProps) {
+    return (
+        <div className="space-y-1">
+            <label htmlFor={name} className="block text-sm text-white/70">
+                {label}
+                {required && <span className="ml-1 text-red-500">*</span>}
+            </label>
+
+            <select
+                id={name}
+                name={name}
+                value={value}
+                required={required}
+                onChange={onChange}
+                className={`w-full rounded-lg bg-[#121212] px-3 py-2 text-sm text-white ring-1 ring-white/10 outline-none focus:ring-2 focus:ring-red-600 ${
+                    error
+                        ? 'ring-red-500'
+                        : 'ring-white/10 focus:ring-2 focus:ring-red-600'
+                }`}
+            >
+                {children}
+            </select>
 
             {error && <p className="text-xs text-red-400">{error}</p>}
         </div>
