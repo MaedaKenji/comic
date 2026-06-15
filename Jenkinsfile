@@ -5,52 +5,46 @@ pipeline {
         stage('Clone Code') {
             steps {
                 echo 'Mengambil kode terbaru dari GitHub...'
+                // Biasanya stage ini otomatis diclone oleh Jenkins jika pakai Multibranch/Webhook
             }
         }
-        stage('Install Dependencies') {
+
+        stage('Prepare Environment') {
             steps {
-                echo 'Installing dependencies...'
-                sh 'npm install'
+                echo 'Menyiapkan file .env untuk Docker Build...'
+                // Membuat file .env jika belum ada
+                sh 'cp -n .env.example .env || true'
+                
+                // Set agar Laravel tahu kita menggunakan disk S3 (MinIO)
+                // Kita bisa inject konfigurasi lewat sed atau menggunakan .env yang sudah matang
+                echo 'Environment siap.'
             }
         }
 
-        stage('Database Migration') {
-            steps {
-                echo 'Menjalankan migrasi database...'
-                // Flag --force wajib digunakan agar Laravel tidak meminta konfirmasi (yes/no) di Jenkins
-                sh 'php artisan migrate --force'
-            }
-        }
-
-        stage('Simulasi Test') {
-            steps {
-                echo 'Menjalankan unit testing...'
-            }
-        }
-
-        stage('Simulasi Build') {
-            steps {
-                sh 'npm run build'
-                echo 'Aplikasi berhasil di-build dan siap di-deploy!'
-            }
-        }
-
-        
-
-        stage('Deploy to Localhost') {
+        stage('Deploy Container') {
             steps {
                 echo 'Menghentikan container lama jika ada...'
-                // Menghindari error port bentrok saat deploy ulang
                 sh 'docker stop comic-reader-app || true'
                 sh 'docker rm comic-reader-app || true'
 
-                echo 'Membangun Docker Image baru...'
+                echo 'Membangun Docker Image (Proses install & build terjadi di dalam sini)...'
                 sh 'docker build -t comic-reader:latest .'
 
                 echo 'Menjalankan webapp di localhost port 3000...'
-                sh 'docker run -d -p 3000:3000 --name comic-reader-app comic-reader:latest'
+                // Kita hubungkan sekalian dengan network database & minio kamu jika diperlukan
+                sh 'docker run -d -p 3000:8000 --name comic-reader-app comic-reader:latest'
 
-                echo 'Aplikasi berhasil di-deploy! Silakan buka http://localhost:3000'
+                echo 'Aplikasi berhasil di-deploy di dalam container!'
+            }
+        }
+
+        stage('Database Migration & Seed') {
+            steps {
+                echo 'Menjalankan migrasi di dalam container yang baru menyala...'
+                // Perintah artisan dieksekusi dari LUAR masuk ke DALAM container yang sedang running
+                sh 'docker exec comic-reader-app php artisan key:generate --force'
+                sh 'docker exec comic-reader-app php artisan migrate --force'
+                sh 'docker exec comic-reader-app php artisan db:seed --force'
             }
         }
     }
