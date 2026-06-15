@@ -14,6 +14,14 @@ pipeline {
             }
         }
 
+        stage('Database Migration') {
+            steps {
+                echo 'Menjalankan migrasi database...'
+                // Flag --force wajib digunakan agar Laravel tidak meminta konfirmasi (yes/no) di Jenkins
+                sh 'php artisan migrate --force'
+            }
+        }
+
         stage('Simulasi Test') {
             steps {
                 echo 'Menjalankan unit testing...'
@@ -26,6 +34,8 @@ pipeline {
                 echo 'Aplikasi berhasil di-build dan siap di-deploy!'
             }
         }
+
+        
 
         stage('Deploy to Localhost') {
             steps {

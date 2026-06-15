@@ -86,7 +86,8 @@ const Navbar: React.FC = () => {
                         <a href="/">
                             <div className="flex items-center gap-3">
                                 <img
-                                    src="https://storage.vexmanga.com/public/upload/2024/12/02/Logo-d426c8cb30892710.webp"
+                                    // src="https://storage.vexmanga.com/public/upload/2024/12/02/Logo-d426c8cb30892710.webp"
+                                    src="http://localhost:9000/comic-laravel/Logo-d426c8cb30892710.webp"
                                     alt="Logo"
                                     width={48}
                                     height={48}
@@ -182,16 +183,14 @@ const Navbar: React.FC = () => {
 
                             {/* Search Overlay */}
                             <div
-                                className={`fixed inset-0 z-[70] transition ${
-                                    openSearch ? 'visible' : 'invisible'
-                                }`}
+                                className={`fixed inset-0 z-[70] transition ${openSearch ? 'visible' : 'invisible'
+                                    }`}
                             >
                                 {/* Backdrop */}
                                 <div
                                     onClick={() => setOpenSearch(false)}
-                                    className={`absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${
-                                        openSearch ? 'opacity-100' : 'opacity-0'
-                                    }`}
+                                    className={`absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${openSearch ? 'opacity-100' : 'opacity-0'
+                                        }`}
                                 />
 
                                 {/* Floating Panel */}

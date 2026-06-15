@@ -12,8 +12,8 @@ return new class extends Migration {
     {
         Schema::table('comics', function (Blueprint $table) {
             // Add description field for comic summaries not nullable
-            $table->string('description')->nullable(false)->after('description');
-            $table->string('cover_path')->nullable()->after('cover_url');
+            $table->text('description')->nullable(false)->after('author');
+            $table->string('cover_path')->nullable()->after('description');
         });
 
     }
@@ -24,7 +24,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('comics', function (Blueprint $table) {
-            //
+            $table->dropColumn(['description', 'cover_path']);
         });
     }
 };

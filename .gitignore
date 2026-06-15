@@ -3,6 +3,8 @@
 /node_modules
 /public/build
 /public/hot
+/storage/app/public/covers/*
+!/storage/app/public/covers/seed.jpg
 /public/storage
 /resources/js/actions
 /resources/js/routes
