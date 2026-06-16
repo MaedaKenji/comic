@@ -1,0 +1,13 @@
+# Abaikan folder storage lokal (biar gak rebutan hak akses)
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/testing/*
+storage/framework/views/*
+storage/logs/*
+
+# Abaikan juga folder frontend mentah & vendor
+node_modules/
+vendor/
+.git/
+.env
+bootstrap/cache/*.php

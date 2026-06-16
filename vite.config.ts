@@ -38,7 +38,9 @@ export default defineConfig({
             allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
         },
         hmr: {
-            host: 'localhost', // Memaksa websocket HMR mengarah ke localhost Windows
+            protocol: 'ws',
+            host: 'localhost',
+            port: 5173,
         },
     },
     esbuild: {
