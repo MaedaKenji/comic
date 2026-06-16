@@ -23,6 +23,7 @@ pipeline {
                 sh 'docker rm comic-reader-app || true'
 
                 echo 'Membangun Docker Image (Proses install & build terjadi di dalam sini)...'
+                sh 'docker buildx use default || true'
                 sh 'docker build -t comic:latest .'
 
                 echo 'Menjalankan webapp di localhost port 8001...'

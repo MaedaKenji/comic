@@ -38,7 +38,10 @@ class ComicSeeder extends Seeder
         ];
 
         foreach ($comics as $comic) {
-            Comic::create($comic);
+            Comic::updateOrCreate(
+                ['title' => $comic['title']],
+                $comic
+            );
         }
     }
 }
