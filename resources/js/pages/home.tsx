@@ -24,7 +24,7 @@ const Home: React.FC = () => {
         <div className="min-h-screen bg-[#050607] text-white">
             {/* head title */}
             <title>Vortex Manga</title>
-            <Navbar />
+            {/* <Navbar /> */}
 
             <main className="mx-auto px-2 mt-5">
                 {<HeroSlider />}
