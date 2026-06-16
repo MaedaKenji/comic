@@ -1,9 +1,9 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Comic;
 use Inertia\Inertia;
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -34,14 +34,14 @@ class HomeController extends Controller
     private function transformComic($comic)
     {
         return [
-            'id'          => $comic->id,
-            'title'       => $comic->title,
-            'author'      => $comic->author,
+            'id' => $comic->id,
+            'title' => $comic->title,
+            'author' => $comic->author,
             'description' => $comic->description,
-            'cover'       => $comic->cover_path ? asset('storage/' . $comic->cover_path) : null,
-            'badge'       => $comic->badge,
-            'genre'       => $comic->genre,
-            'slug'        => $comic->slug,
+            'cover' => $comic->cover_path ? (str_starts_with($comic->cover_path, 'http://') || str_starts_with($comic->cover_path, 'https://') ? $comic->cover_path : asset('storage/'.$comic->cover_path)) : null,
+            'badge' => $comic->badge,
+            'genre' => $comic->genre,
+            'slug' => $comic->slug,
         ];
     }
 }

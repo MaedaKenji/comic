@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::table('comics', function (Blueprint $table) {
             Schema::table('comics', function (Blueprint $table) {
-            // Adds the column. 'nullable' is usually recommended for new columns 
-            // on existing tables to avoid errors with old records.
-            $table->string('alt_title')->nullable()->after('title');
-        });
+                // Adds the column. 'nullable' is usually recommended for new columns
+                // on existing tables to avoid errors with old records.
+                $table->string('alt_title')->nullable()->after('title');
+            });
         });
     }
 

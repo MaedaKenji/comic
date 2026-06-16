@@ -12,7 +12,7 @@ class StoreIntendedUrl
     {
         if (
             $request->method() === 'GET' &&
-            !Auth::check() &&
+            ! Auth::check() &&
             ! $request->is('login', 'register', 'password/*')
         ) {
             $request->session()->put('url.intended', $request->fullUrl());

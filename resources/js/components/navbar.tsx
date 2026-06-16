@@ -86,7 +86,6 @@ const Navbar: React.FC = () => {
                         <a href="/">
                             <div className="flex items-center gap-3">
                                 <img
-                                    // src="https://storage.vexmanga.com/public/upload/2024/12/02/Logo-d426c8cb30892710.webp"
                                     src="http://localhost:9000/comic-laravel/Logo-d426c8cb30892710.webp"
                                     alt="Logo"
                                     width={48}

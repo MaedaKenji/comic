@@ -1,31 +1,25 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-use App\Models\Comic;
-
-use Inertia\Inertia;
-
+use App\Http\Controllers\Admin\AdminComicController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\AdminComicController;
 use App\Http\Controllers\ComicController;
 use App\Http\Controllers\HomeController;
-
+use App\Models\Comic;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
 
 Route::post('/register', [RegisterController::class, 'store']);
 Route::get('/register', function () {
     return Inertia::render('register');
 });
 
-Route::get('/login', fn() => Inertia::render('login'))->name('login');
+Route::get('/login', fn () => Inertia::render('login'))->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', function () {
@@ -46,11 +40,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])
     });
 Route::redirect('/admin', '/admin/dashboard');
 
-
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', fn() => Inertia::render('Profile'));
+    Route::get('/profile', fn () => Inertia::render('Profile'));
 });
-
 
 // Go to that comic page
 Route::get('/comics/{comic:slug}', [ComicController::class, 'show'])
@@ -59,6 +51,3 @@ Route::get('/comics/{comic:slug}', [ComicController::class, 'show'])
 //     ->name('comics.chapters.show');
 Route::get('/comics/{comic}/{chapter}', [ComicController::class, 'reader'])
     ->name('comics.reader');
-
-
-

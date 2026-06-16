@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateComicRequest;
+use App\Http\Resources\ComicResource;
 use App\Models\Comic;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Storage;
-use App\Http\Resources\ComicResource;
-use App\Http\Requests\UpdateComicRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 use Intervention\Image\Laravel\Facades\Image;
 
 class AdminComicController extends Controller
@@ -20,10 +20,12 @@ class AdminComicController extends Controller
             'comics' => ComicResource::collection(Comic::latest()->get()),
         ]);
     }
+
     public function create()
     {
         return Inertia::render('admin/comics/create');
     }
+
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -79,6 +81,7 @@ class AdminComicController extends Controller
             ->route('admin.comics.index', $comic)
             ->with('success', 'Comic updated successfully.');
     }
+
     public function destroy(Comic $comic)
     {
         if ($comic->cover_path) {
@@ -109,7 +112,7 @@ class AdminComicController extends Controller
             // 1. Create or Update the Chapter
             $chapter = $comic->chapters()->updateOrCreate(
                 ['number' => $request->chapter_number],
-                ['title' => $request->title ?? "Chapter " . $request->chapter_number]
+                ['title' => $request->title ?? 'Chapter '.$request->chapter_number]
             );
 
             foreach ($request->file('images') as $index => $imageItem) {
@@ -123,7 +126,7 @@ class AdminComicController extends Controller
                 $img->scale(width: 1600);
 
                 // 3. Prepare Path & Filename
-                $filename = "page_" . time() . "_" . $index . ".webp";
+                $filename = 'page_'.time().'_'.$index.'.webp';
                 $directory = "comics/{$comic->id}/chapters/{$chapter->id}";
                 $fullPath = "{$directory}/{$filename}";
 

@@ -1,10 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminComicController;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\Admin\AdminComicController;
-use App\Models\Comic;
 
 it('stores comic without cover', function () {
     $data = [
@@ -15,7 +14,7 @@ it('stores comic without cover', function () {
 
     $request = Request::create('/admin/comics', 'POST', $data);
 
-    (new AdminComicController())->store($request);
+    (new AdminComicController)->store($request);
 
     $this->assertDatabaseHas('comics', ['title' => 'Test Comic']);
 });
@@ -32,8 +31,8 @@ it('stores comic with cover', function () {
 
     $request->files->set('cover', $file);
 
-    (new AdminComicController())->store($request);
+    (new AdminComicController)->store($request);
 
-    Storage::disk('public')->assertExists('covers/' . $file->hashName());
+    Storage::disk('public')->assertExists('covers/'.$file->hashName());
     $this->assertDatabaseHas('comics', ['title' => 'Test Comic With Cover']);
 });

@@ -1,12 +1,13 @@
 <?php
+
 // app/Http/Controllers/ComicController.php
 // Used for displaying comics to users not admin management
+
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ComicResource;
 use App\Models\Comic;
 use Inertia\Inertia;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\ComicResource;
 
 class ComicController extends Controller
 {
@@ -38,7 +39,7 @@ class ComicController extends Controller
             ->with([
                 'pages' => function ($q) {
                     $q->orderBy('page_number');
-                }
+                },
             ])
             ->firstOrFail();
 
@@ -59,10 +60,10 @@ class ComicController extends Controller
                 'id' => $chapter->id,
                 'number' => $chapter->number,
                 'title' => $chapter->title,
-                'pages' => $chapter->pages->map(fn($page) => [
+                'pages' => $chapter->pages->map(fn ($page) => [
                     'id' => $page->id,
                     'page_number' => $page->page_number,
-                    'image' => asset('storage/' . $page->image_path),
+                    'image' => asset('storage/'.$page->image_path),
                 ]),
             ],
             'navigation' => [
@@ -71,11 +72,12 @@ class ComicController extends Controller
             ],
         ]);
     }
+
     public function reader(Comic $comic, $chapterNumber)
     {
         $chapter = $comic->chapters()
             ->where('number', $chapterNumber)
-            ->with(['pages' => fn($q) => $q->orderBy('page_number')])
+            ->with(['pages' => fn ($q) => $q->orderBy('page_number')])
             ->firstOrFail();
 
         return Inertia::render('comics/reader/index', [
@@ -84,10 +86,10 @@ class ComicController extends Controller
                 'id' => $chapter->id,
                 'number' => $chapter->number,
                 'title' => $chapter->title,
-                'pages' => $chapter->pages->map(fn($page) => [
+                'pages' => $chapter->pages->map(fn ($page) => [
                     'id' => $page->id,
                     'page_number' => $page->page_number,
-                    'image' => asset('storage/' . $page->image_path),
+                    'image' => asset('storage/'.$page->image_path),
                 ]),
             ],
             'chapters' => $comic->chapters()
@@ -96,5 +98,4 @@ class ComicController extends Controller
         ]);
 
     }
-
 }

@@ -24,7 +24,7 @@ class ComicResource extends JsonResource
             'description' => $this->description,
             'status' => $this->status, // Added
             'type' => $this->type, // Added
-            'cover' => $this->cover_path ? asset('storage/' . $this->cover_path) : null,
+            'cover' => $this->cover_path ? (str_starts_with($this->cover_path, 'http://') || str_starts_with($this->cover_path, 'https://') ? $this->cover_path : asset('storage/'.$this->cover_path)) : null,
 
             // Stats
             'total_chapters' => $this->chapters_count ?? $this->chapters()->count(),
@@ -35,7 +35,7 @@ class ComicResource extends JsonResource
 
             // Nested Chapters (using a separate ChapterResource is cleaner, but this works)
             'chapters' => $this->whenLoaded('chapters', function () {
-                return $this->chapters->map(fn($chapter) => [
+                return $this->chapters->map(fn ($chapter) => [
                     'id' => $chapter->id,
                     'number' => $chapter->number,
                     'title' => $chapter->title,

@@ -6,7 +6,6 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
-
 it('stores a new comic and maps the cover file to cover_path', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     Storage::fake('public');
@@ -38,7 +37,7 @@ it('stores a new comic and maps the cover file to cover_path', function () {
 it('fails validation if title is missing', function () {
     // 1. Create a user (and ensure they have the 'admin' role if required)
     $user = User::factory()->create([
-        'role' => 'admin'
+        'role' => 'admin',
     ]);
 
     // 2. Act as that user
@@ -85,7 +84,7 @@ it('allows an admin to delete a comic', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $comic = Comic::factory()->create([
         'title' => 'Comic to be Deleted',
-        'cover_path' => 'comics/cover.jpg'
+        'cover_path' => 'comics/cover.jpg',
     ]);
 
     // Create a fake disk if you are testing file deletion too
@@ -118,7 +117,7 @@ it('simulates the guest view and ensures auth props are correct', function () {
     $this->get('/')
         ->assertStatus(200)
         ->assertInertia(
-            fn(Assert $page) => $page
+            fn (Assert $page) => $page
                 ->component('home') // Make sure this matches your file name in Resources/js/Pages
                 ->where('auth.user', null) // Confirm user is a guest
                 // Check that 'hero' data is being sent so the page actually loads

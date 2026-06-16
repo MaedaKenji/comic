@@ -27,6 +27,20 @@ export default defineConfig({
             formVariants: true,
         }),
     ],
+    server: {
+        host: '0.0.0.0', // Supaya Vite mau menerima koneksi dari luar container Docker
+        port: 5173,
+        strictPort: true,
+        origin: 'http://localhost:5173', // ⭐ INI KUNCINYA! Memaksa file public/hot mencatat IP localhost
+        cors: {
+            origin: '*',
+            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+            allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+        },
+        hmr: {
+            host: 'localhost', // Memaksa websocket HMR mengarah ke localhost Windows
+        },
+    },
     esbuild: {
         jsx: 'automatic',
     },

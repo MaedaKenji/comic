@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Chapter;
 use App\Models\ChapterPage;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AdminChapterPageController extends Controller

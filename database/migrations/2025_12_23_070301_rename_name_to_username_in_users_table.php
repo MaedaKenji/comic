@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::table('users', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             // This is the specific command to rename the column
             $table->renameColumn('name', 'username');
         });

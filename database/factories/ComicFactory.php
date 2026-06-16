@@ -15,7 +15,6 @@ class ComicFactory extends Factory
      *
      * @return array<string, mixed>
      */
-
     protected $model = Comic::class;
 
     public function definition(): array
@@ -23,7 +22,7 @@ class ComicFactory extends Factory
         return [
             'title' => $this->faker->sentence(3),
             'cover_path' => null,
-            'description' => $this->faker->paragraph(), 
+            'description' => $this->faker->paragraph(),
         ];
     }
 }

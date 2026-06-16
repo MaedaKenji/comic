@@ -8,8 +8,6 @@ use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
-
-
     /**
      * The root template that's loaded on the first page visit.
      *
@@ -63,15 +61,13 @@ class HandleInertiaRequests extends Middleware
                 ] : null,
             ],
 
-            'sidebarOpen' =>
-                !$request->hasCookie('sidebar_state')
+            'sidebarOpen' => ! $request->hasCookie('sidebar_state')
                 || $request->cookie('sidebar_state') === 'true',
 
             'flash' => [
-                'success' => fn() => $request->session()->get('success'),
-                'error' => fn() => $request->session()->get('error'),
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
             ],
         ];
     }
-
 }

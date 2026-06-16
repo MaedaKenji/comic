@@ -16,7 +16,9 @@ interface HomeProps {
 const Home: React.FC = () => {
     const props = usePage().props as unknown as HomeProps;
     const { auth } = usePage().props as any;
-    const { popular } = props;
+    const popular = props?.popular || [];
+
+    console.log('Home Page Props:', { props, auth, popular });
 
     return (
         <div className="min-h-screen bg-[#050607] text-white">
@@ -24,20 +26,26 @@ const Home: React.FC = () => {
             <title>Vortex Manga</title>
             <Navbar />
 
-            <main className="mx-auto px-2">
+            <main className="mx-auto px-2 mt-5">
                 {<HeroSlider />}
 
-                <HorizontalShelf title="Popular">
-                    {popular.map((manga) => (
-                        <Link
-                            key={manga.id}
-                            href={route('comics.show', { comic: manga.slug })}
-                            className="flex-shrink-0 transition hover:opacity-90"
-                        >
-                            <MangaCard item={manga} />
-                        </Link>
-                    ))}
-                </HorizontalShelf>
+                {popular.length > 0 ? (
+                    <HorizontalShelf title="Popular">
+                        {popular.map((manga) => (
+                            <Link
+                                key={manga.id}
+                                href={route('comics.show', { comic: manga.slug })}
+                                className="flex-shrink-0 transition hover:opacity-90"
+                            >
+                                <MangaCard item={manga} />
+                            </Link>
+                        ))}
+                    </HorizontalShelf>
+                ) : (
+                    <div className="py-12 text-center text-gray-500">
+                        No popular manga available at the moment.
+                    </div>
+                )}
 
                 {/* Admin Floating Add Button */}
                 {auth?.user?.role === 'admin' && (
